@@ -10,51 +10,24 @@
     <style>
         :root { 
             --p: #248bf5; --bg: #09090b; --c: #18181b; --b: #27272a; --t: #fafafa; --s: #a1a1aa; --danger: #ef4444; 
-            /* Оптимальный отступ снизу для кнопок Android */
             --safe-bottom: 25px; 
         }
         [data-theme="light"] { --bg: #f4f4f5; --c: #ffffff; --b: #e4e4e7; --t: #09090b; --s: #71717a; }
         
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: var(--bg);
-        }
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg); }
+        body { display: flex; flex-direction: column; position: fixed; inset: 0; }
 
-        body { 
-            display: flex; 
-            flex-direction: column; 
-            position: fixed; /* Фиксируем, чтобы избежать прыжков */
-            top: 0; left: 0; bottom: 0; right: 0;
-        }
-
-        /* Навигация: аккуратный отступ снизу */
         .nav-bar { 
-            background: var(--c); 
-            border-top: 1px solid var(--b); 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 10px 0 calc(5px + var(--safe-bottom)); 
-            z-index: 1000; 
-            flex-shrink: 0;
+            background: var(--c); border-top: 1px solid var(--b); display: flex; 
+            justify-content: space-around; padding: 10px 0 calc(5px + var(--safe-bottom)); 
+            z-index: 1000; flex-shrink: 0;
         }
-
         .nav-item { color: var(--s); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 4px; flex: 1; transition: 0.2s; }
         .nav-item.active { color: var(--p); transform: translateY(-2px); }
 
-        .screen { 
-            flex: 1; 
-            display: none; 
-            flex-direction: column; 
-            overflow: hidden; 
-            /* padding-top убираем или делаем минимальным, чтобы не было дырки сверху */
-            padding-top: env(safe-area-inset-top, 0px); 
-        }
+        .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top, 0px); }
         .screen.active { display: flex; }
 
         .header { padding: 15px 20px; background: var(--c); border-bottom: 1px solid var(--b); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
@@ -63,17 +36,16 @@
         .card { background: var(--c); border: 1px solid var(--b); border-radius: 20px; padding: 15px; }
         .post-img { width: 100%; border-radius: 14px; margin-top: 12px; object-fit: cover; max-height: 300px; }
 
-        /* Поле ввода в чате: также учитываем отступ */
         .input-zone { padding: 10px 15px calc(10px + var(--safe-bottom)); background: var(--c); border-top: 1px solid var(--b); display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
         .input-field { flex: 1; background: var(--bg); border: 1px solid var(--b); color: var(--t); padding: 12px 18px; border-radius: 25px; font-size: 15px; }
         .btn-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--p); border: none; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         
         .ava { width: 45px; height: 45px; border-radius: 12px; object-fit: cover; background: var(--b); }
-        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; margin-bottom: 5px; line-height: 1.4; }
+        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; margin-bottom: 5px; line-height: 1.4; word-wrap: break-word; }
         .bubble.me { align-self: flex-end; background: var(--p); color: white; border-bottom-right-radius: 4px; }
         .bubble.not-me { align-self: flex-start; background: var(--b); border-bottom-left-radius: 4px; }
 
-        .search-res { position: absolute; top: 120px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 15px; z-index: 500; max-height: 250px; overflow-y: auto; display: none; }
+        .search-res { position: absolute; top: 130px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 15px; z-index: 500; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .user-row { padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid var(--b); }
         
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -108,10 +80,10 @@
 
     <div id="scr-chats" class="screen">
         <div class="header">Чаты</div>
-        <div style="padding:15px;">
+        <div style="padding:15px; position:relative;">
             <div style="display:flex; align-items:center; background:var(--c); border-radius:15px; padding:0 15px; border:1px solid var(--b)">
                 <i data-lucide="search" size="18" style="color:var(--s)"></i>
-                <input type="text" id="searchUser" placeholder="Поиск..." class="input-field" style="border:none; background:transparent;">
+                <input type="text" id="searchUser" placeholder="Поиск пользователей..." class="input-field" style="border:none; background:transparent;">
             </div>
             <div class="search-res" id="searchRes"></div>
         </div>
@@ -260,37 +232,70 @@
             const val = e.target.value.toLowerCase().trim();
             const resBox = document.getElementById('searchRes');
             if(val.length < 2) { resBox.style.display = 'none'; return; }
+            
+            // Поиск пользователей
             onSnapshot(query(collection(db, "users"), where("nick", ">=", val), limit(5)), (snaps) => {
                 resBox.innerHTML = "";
-                snaps.forEach(doc => {
-                    const u = doc.data(); if(u.uid === user.uid) return;
-                    const row = document.createElement('div'); row.className = 'user-row';
-                    row.innerHTML = `<img src="${u.avatar}" class="ava" style="width:30px;height:30px"> ${u.nick}`;
+                snaps.forEach(docSnap => {
+                    const u = docSnap.data(); 
+                    if(u.uid === user.uid) return;
+                    const row = document.createElement('div'); 
+                    row.className = 'user-row';
+                    row.innerHTML = `<img src="${u.avatar}" class="ava" style="width:30px;height:30px"> <span>${u.nick}</span>`;
                     row.onclick = () => openChat(u.uid, u.nick, u.avatar);
                     resBox.appendChild(row);
                 });
-                resBox.style.display = 'block';
+                resBox.style.display = resBox.innerHTML === "" ? 'none' : 'block';
             });
         };
 
-        window.openChat = (uid, nick, ava) => {
-            activeChatId = user.uid < uid ? user.uid + "_" + uid : uid + "_" + user.uid;
+        window.openChat = async (otherUid, nick, ava) => {
+            // Генерируем ID чата (всегда одинаковый для этих двух людей)
+            activeChatId = user.uid < otherUid ? user.uid + "_" + otherUid : otherUid + "_" + user.uid;
+            
             document.getElementById('chat-title').innerText = nick;
             document.getElementById('chat-ava').src = ava;
             document.getElementById('searchRes').style.display = 'none';
             document.getElementById('searchUser').value = "";
-            showScreen('msg'); initMessages();
+            
+            // Сразу создаем/обновляем запись в разговорах, чтобы чат появился в списке
+            await setDoc(doc(db, "conversations", activeChatId), {
+                users: [user.uid, otherUid],
+                lastMsg: "Начните общение...",
+                time: serverTimestamp()
+            }, { merge: true });
+
+            showScreen('msg'); 
+            initMessages();
         };
 
         function initChatList() {
-            onSnapshot(query(collection(db, "conversations"), where("users", "array-contains", user.uid), orderBy("time", "desc")), async (snaps) => {
-                const list = document.getElementById('chat-list'); list.innerHTML = "";
+            // Слушаем все переписки, где есть текущий пользователь
+            const q = query(collection(db, "conversations"), where("users", "array-contains", user.uid), orderBy("time", "desc"));
+            
+            onSnapshot(q, async (snaps) => {
+                const list = document.getElementById('chat-list');
+                list.innerHTML = "";
+                
                 for (const d of snaps.docs) {
-                    const conv = d.data(); const otherId = conv.users.find(id => id !== user.uid);
-                    const uDoc = await getDoc(doc(db, "users", otherId)); const other = uDoc.data();
+                    const conv = d.data();
+                    const otherId = conv.users.find(id => id !== user.uid);
+                    
+                    // Получаем актуальные данные собеседника
+                    const uDoc = await getDoc(doc(db, "users", otherId));
+                    const other = uDoc.data();
+                    
                     if (other) {
-                        const item = document.createElement('div'); item.className = 'user-row card'; item.style.marginBottom = '10px';
-                        item.innerHTML = `<img src="${other.avatar}" class="ava"><div style="flex:1"><b>${other.nick}</b><div style="font-size:12px; color:var(--s); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">${conv.lastMsg}</div></div>`;
+                        const item = document.createElement('div');
+                        item.className = 'user-row card';
+                        item.style.marginBottom = '10px';
+                        item.innerHTML = `
+                            <img src="${other.avatar}" class="ava">
+                            <div style="flex:1; overflow:hidden;">
+                                <b>${other.nick}</b>
+                                <div style="font-size:12px; color:var(--s); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${conv.lastMsg}</div>
+                            </div>
+                        `;
                         item.onclick = () => openChat(otherId, other.nick, other.avatar);
                         list.appendChild(item);
                     }
@@ -299,32 +304,59 @@
         }
 
         function initMessages() {
-            onSnapshot(query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc")), (snaps) => {
-                const box = document.getElementById('messages-box'); box.innerHTML = "";
+            const q = query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc"));
+            onSnapshot(q, (snaps) => {
+                const box = document.getElementById('messages-box');
+                box.innerHTML = "";
                 snaps.forEach(d => {
-                    const m = d.data(); box.innerHTML += `<div class="bubble ${m.uid === user.uid ? 'me' : 'not-me'}">${m.text}</div>`;
+                    const m = d.data();
+                    const bubble = document.createElement('div');
+                    bubble.className = `bubble ${m.uid === user.uid ? 'me' : 'not-me'}`;
+                    bubble.innerText = m.text;
+                    box.appendChild(bubble);
                 });
                 box.scrollTop = box.scrollHeight;
             });
         }
 
         document.getElementById('sendMsg').onclick = async () => {
-            const text = document.getElementById('msgInput').value;
-            if(!text.trim() || !activeChatId) return;
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if(!text || !activeChatId) return;
+            
             const parts = activeChatId.split('_');
-            await addDoc(collection(db, "chats", activeChatId, "messages"), { text, uid: user.uid, time: serverTimestamp() });
-            await setDoc(doc(db, "conversations", activeChatId), { lastMsg: text, time: serverTimestamp(), users: parts }, { merge: true });
-            document.getElementById('msgInput').value = "";
+            
+            // 1. Добавляем сообщение
+            await addDoc(collection(db, "chats", activeChatId, "messages"), {
+                text,
+                uid: user.uid,
+                time: serverTimestamp()
+            });
+
+            // 2. Обновляем инфо в списке чатов
+            await setDoc(doc(db, "conversations", activeChatId), {
+                lastMsg: text,
+                time: serverTimestamp(),
+                users: parts
+            }, { merge: true });
+
+            input.value = "";
         };
 
         document.getElementById('deleteAccBtn').onclick = async () => {
             if(!confirm("Удалить аккаунт?")) return;
-            try { await deleteDoc(doc(db, "users", auth.currentUser.uid)); await deleteUser(auth.currentUser); location.reload(); } 
-            catch (e) { alert("Перезайдите в приложение."); }
+            try { 
+                await deleteDoc(doc(db, "users", auth.currentUser.uid)); 
+                await deleteUser(auth.currentUser); 
+                location.reload(); 
+            } catch (e) { alert("Пожалуйста, перезайдите в систему и попробуйте снова."); }
         };
 
         window.logout = () => signOut(auth).then(() => location.reload());
-        window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+        window.toggleTheme = () => {
+            const current = document.body.dataset.theme;
+            document.body.dataset.theme = current === 'light' ? 'dark' : 'light';
+        };
     </script>
 </body>
 </html>
