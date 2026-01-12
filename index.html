@@ -11,46 +11,36 @@
         [data-theme="light"] { --bg: #f4f4f5; --c: #ffffff; --b: #e4e4e7; --t: #09090b; --s: #71717a; }
         
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; background: var(--bg); color: var(--t); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s; }
+        body { margin: 0; background: var(--bg); color: var(--t); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Navigation */
         .nav-bar { background: var(--c); border-top: 1px solid var(--b); display: flex; justify-content: space-around; padding: 12px 5px; z-index: 100; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
         .nav-item { color: var(--s); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 4px; transition: 0.2s; flex: 1; }
         .nav-item.active { color: var(--p); transform: translateY(-2px); }
 
-        /* Screens */
         .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; position: relative; animation: fadeIn 0.3s ease; }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header { padding: 18px 20px; background: var(--c); border-bottom: 1px solid var(--b); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(10px); }
-
-        /* Content */
+        .header { padding: 18px 20px; background: var(--c); border-bottom: 1px solid var(--b); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: space-between; }
         .content-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
-        .card { background: var(--c); border: 1px solid var(--b); border-radius: 20px; padding: 15px; transition: 0.2s; }
-        .card:active { transform: scale(0.98); }
+        
+        .card { background: var(--c); border: 1px solid var(--b); border-radius: 20px; padding: 15px; }
         .post-img { width: 100%; border-radius: 14px; margin-top: 12px; object-fit: cover; max-height: 350px; border: 1px solid var(--b); }
         
-        /* Inputs */
         .input-zone { padding: 12px 15px; background: var(--c); border-top: 1px solid var(--b); display: flex; gap: 12px; align-items: center; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
         .input-field { flex: 1; background: var(--bg); border: 1px solid var(--b); color: var(--t); padding: 12px 18px; border-radius: 25px; font-size: 15px; }
-        .btn-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--p); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(36, 139, 245, 0.3); }
+        .btn-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--p); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-        /* Search & Lists */
-        .search-res { position: absolute; top: 130px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 18px; z-index: 50; max-height: 300px; overflow-y: auto; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .search-res { position: absolute; top: 130px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 18px; z-index: 50; max-height: 300px; overflow-y: auto; display: none; }
         .user-row { padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid var(--b); }
-        .ava { width: 45px; height: 45px; border-radius: 15px; object-fit: cover; background: var(--b); border: 1px solid var(--b); }
+        .ava { width: 45px; height: 45px; border-radius: 15px; object-fit: cover; background: var(--b); }
 
-        /* Chat Bubbles */
-        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; position: relative; font-size: 15px; line-height: 1.4; margin-bottom: 4px; }
+        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; position: relative; font-size: 15px; margin-bottom: 4px; }
         .bubble.me { align-self: flex-end; background: var(--p); color: white; border-bottom-right-radius: 4px; }
         .bubble.not-me { align-self: flex-start; background: var(--b); border-bottom-left-radius: 4px; }
         .time { font-size: 10px; opacity: 0.6; margin-top: 5px; text-align: right; }
 
-        /* Auth Screen */
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 25px; }
-        .auth-card { width: 100%; max-width: 380px; text-align: center; }
-
         .loader { width: 20px; height: 20px; border: 3px solid #fff; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
@@ -58,26 +48,24 @@
 <body>
 
     <div id="auth-screen">
-        <div class="auth-card">
-            <h1 style="color:var(--p); font-size: 42px; margin-bottom: 30px; letter-spacing: -1px;">Directo</h1>
-            <div id="auth-form" class="card">
-                <input type="email" id="email" placeholder="Email" class="input-field" style="width:100%; margin-bottom:12px;">
-                <input type="password" id="pass" placeholder="Password" class="input-field" style="width:100%; margin-bottom:12px;">
-                <div id="reg-box" style="display:none">
-                    <input type="text" id="nick" placeholder="Username" class="input-field" style="width:100%; margin-bottom:12px;">
-                </div>
-                <button class="btn-circle" id="authBtn" style="width:100%; border-radius:15px; margin-top:10px;">Continue</button>
-                <p id="toggleAuth" style="font-size:14px; color:var(--s); cursor:pointer; margin-top:20px;">Don't have an account? <span style="color:var(--p)">Sign up</span></p>
+        <div class="card" style="width:100%; max-width:380px; text-align:center;">
+            <h1 style="color:var(--p); font-size: 42px;">Directo</h1>
+            <input type="email" id="email" placeholder="Email" class="input-field" style="width:100%; margin-bottom:12px;">
+            <input type="password" id="pass" placeholder="Password" class="input-field" style="width:100%; margin-bottom:12px;">
+            <div id="reg-box" style="display:none">
+                <input type="text" id="nick" placeholder="Username" class="input-field" style="width:100%; margin-bottom:12px;">
             </div>
+            <button class="btn-circle" id="authBtn" style="width:100%; border-radius:15px; margin-top:10px;">Continue</button>
+            <p id="toggleAuth" style="font-size:14px; color:var(--p); cursor:pointer; margin-top:20px;">Create account</p>
         </div>
     </div>
 
     <div id="scr-feed" class="screen active">
-        <div class="header">Feed <i data-lucide="plus-circle" id="addPostBtn" style="cursor:pointer; color:var(--p)"></i></div>
+        <div class="header">Feed <i data-lucide="plus-circle" id="addPostBtn" style="cursor:pointer"></i></div>
         <div id="post-input" style="display:none; padding:15px; background:var(--c); border-bottom:1px solid var(--b);">
             <div style="display:flex; gap:10px; align-items:center;">
-                <label class="btn-circle" style="background:var(--b); color:var(--s)"><i data-lucide="image"></i><input type="file" id="postFile" hidden></label>
-                <input type="text" id="postText" placeholder="What's on your mind?" class="input-field">
+                <label class="btn-circle" style="background:var(--b)"><i data-lucide="image"></i><input type="file" id="postFile" hidden></label>
+                <input type="text" id="postText" placeholder="Что нового?" class="input-field">
                 <button class="btn-circle" id="sendPost"><i data-lucide="send"></i></button>
             </div>
         </div>
@@ -87,14 +75,13 @@
     <div id="scr-chats" class="screen">
         <div class="header">Messages</div>
         <div style="padding:15px;">
-            <div style="position:relative; display:flex; align-items:center; background:var(--c); border-radius:15px; padding:2px 15px; border:1px solid var(--b)">
+            <div style="display:flex; align-items:center; background:var(--c); border-radius:15px; padding:0 15px; border:1px solid var(--b)">
                 <i data-lucide="search" size="18" style="color:var(--s)"></i>
                 <input type="text" id="searchUser" placeholder="Search people..." class="input-field" style="border:none; background:transparent;">
             </div>
             <div class="search-res" id="searchRes"></div>
         </div>
-        <div class="content-scroll" id="chat-list">
-            </div>
+        <div class="content-scroll" id="chat-list"></div>
     </div>
 
     <div id="scr-msg" class="screen">
@@ -108,46 +95,31 @@
         <div class="content-scroll" id="messages-box"></div>
         <div class="input-zone">
             <label style="cursor:pointer; color:var(--s)"><i data-lucide="paperclip"></i><input type="file" id="msgFile" hidden></label>
-            <input type="text" id="msgInput" placeholder="Write a message..." class="input-field">
-            <button class="btn-circle" id="sendMsg"><i data-lucide="arrow-up-right"></i></button>
+            <input type="text" id="msgInput" placeholder="Write..." class="input-field">
+            <button class="btn-circle" id="sendMsg"><i data-lucide="arrow-up"></i></button>
         </div>
     </div>
 
     <div id="scr-prof" class="screen">
-        <div class="header">Profile</div>
-        <div class="content-scroll" style="align-items:center; padding-top:40px;">
-            <div style="position:relative; margin-bottom:20px;">
-                <img id="myPic" class="ava" style="width:130px; height:130px; border-radius:45px; border:5px solid var(--c); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                <label class="btn-circle" style="position:absolute; bottom:0; right:0; width:36px; height:36px; cursor:pointer;">
-                    <i data-lucide="camera" size="16"></i>
-                    <input type="file" id="changeAva" hidden>
-                </label>
-            </div>
-            <h2 id="myNickDisplay" style="margin:5px 0;">Username</h2>
-            <p id="myEmailDisplay" style="color:var(--s); font-size:14px; margin-bottom:30px;">email@example.com</p>
-            
-            <button class="card" onclick="toggleTheme()" style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                Appearance <i data-lucide="sun"></i>
-            </button>
-            <button class="card" onclick="logout()" style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:var(--s)">
-                Logout <i data-lucide="log-out"></i>
-            </button>
-            <button class="card" id="deleteAccBtn" style="width:100%; display:flex; justify-content:space-between; align-items:center; color:var(--danger); border-color:rgba(239, 68, 68, 0.2)">
-                Delete Account <i data-lucide="user-minus"></i>
-            </button>
+        <div class="header">Settings</div>
+        <div class="content-scroll" style="align-items:center;">
+            <img id="myPic" class="ava" style="width:120px; height:120px; border-radius:40px; border:4px solid var(--p)">
+            <h2 id="myNickDisplay">Username</h2>
+            <button class="card" onclick="toggleTheme()" style="width:100%; display:flex; justify-content:space-between;">Theme <i data-lucide="moon"></i></button>
+            <button class="card" onclick="logout()" style="width:100%; color:var(--danger)">Logout</button>
         </div>
     </div>
 
-    <div class="nav-bar" id="bottom-nav">
-        <div class="nav-item active" onclick="showScreen('feed', this)"><i data-lucide="layout-grid"></i>Feed</div>
-        <div class="nav-item" onclick="showScreen('chats', this)"><i data-lucide="message-square"></i>Chats</div>
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="showScreen('feed', this)"><i data-lucide="layout"></i>Feed</div>
+        <div class="nav-item" onclick="showScreen('chats', this)"><i data-lucide="message-circle"></i>Chats</div>
         <div class="nav-item" onclick="showScreen('prof', this)"><i data-lucide="user"></i>Profile</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdOZrTcE4ATDlGldnW8_dWRmHuaUuJfak",
@@ -167,7 +139,6 @@
         let activeChatId = null;
         lucide.createIcons();
 
-        // UTILS
         async function upload(file) {
             if(!file) return null;
             const formData = new FormData();
@@ -176,7 +147,7 @@
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
                 const data = await res.json();
                 return data.data.url;
-            } catch (e) { alert("Upload error"); return null; }
+            } catch(e) { return null; }
         }
 
         window.showScreen = (id, el) => {
@@ -188,29 +159,22 @@
             }
         };
 
-        // AUTH
-        const toggleAuthBtn = document.getElementById('toggleAuth');
-        toggleAuthBtn.onclick = () => {
-            const isReg = document.getElementById('reg-box').style.display === 'block';
-            document.getElementById('reg-box').style.display = isReg ? 'none' : 'block';
-            toggleAuthBtn.innerHTML = isReg ? 'Don\'t have an account? <span style="color:var(--p)">Sign up</span>' : 'Already have an account? <span style="color:var(--p)">Login</span>';
+        document.getElementById('toggleAuth').onclick = () => {
+            const b = document.getElementById('reg-box');
+            b.style.display = b.style.display === 'none' ? 'block' : 'none';
         };
 
         document.getElementById('authBtn').onclick = async () => {
-            const btn = document.getElementById('authBtn');
             const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-            btn.innerHTML = '<span class="loader"></span>';
             try {
                 if(document.getElementById('reg-box').style.display === 'block') {
                     const n = document.getElementById('nick').value;
-                    if(n.length < 3) throw new Error("Username too short");
                     const res = await createUserWithEmailAndPassword(auth, e, p);
                     const ava = `https://api.dicebear.com/7.x/identicon/svg?seed=${n}`;
                     await updateProfile(res.user, { displayName: n, photoURL: ava });
-                    await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, nick: n.toLowerCase(), avatar: ava, email: e });
+                    await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, nick: n.toLowerCase(), avatar: ava });
                 } else { await signInWithEmailAndPassword(auth, e, p); }
             } catch (err) { alert(err.message); }
-            btn.innerText = 'Continue';
         };
 
         onAuthStateChanged(auth, u => {
@@ -219,8 +183,8 @@
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('myPic').src = u.photoURL;
                 document.getElementById('myNickDisplay').innerText = u.displayName;
-                document.getElementById('myEmailDisplay').innerText = u.email;
                 initFeed();
+                initChatList();
             } else { document.getElementById('auth-screen').style.display = 'flex'; }
         });
 
@@ -232,12 +196,14 @@
 
         document.getElementById('sendPost').onclick = async () => {
             const text = document.getElementById('postText').value;
-            const url = await upload(document.getElementById('postFile').files[0]);
+            const file = document.getElementById('postFile').files[0];
+            const url = file ? await upload(file) : null;
             if(!text && !url) return;
             await addDoc(collection(db, "feed"), {
                 text, url, user: user.displayName, ava: user.photoURL, time: serverTimestamp()
             });
             document.getElementById('postText').value = "";
+            document.getElementById('postFile').value = "";
             document.getElementById('post-input').style.display = 'none';
         };
 
@@ -247,20 +213,18 @@
                 box.innerHTML = "";
                 snaps.forEach(d => {
                     const p = d.data();
-                    box.innerHTML += `
-                        <div class="card">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <img src="${p.ava}" class="ava" style="width:34px; height:34px;">
-                                <b style="font-size:15px">${p.user}</b>
-                            </div>
-                            <div style="margin-top:12px; font-size:15px; color:var(--t)">${p.text || ""}</div>
-                            ${p.url ? `<img src="${p.url}" class="post-img">` : ""}
-                        </div>`;
+                    box.innerHTML += `<div class="card">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${p.ava}" class="ava" style="width:30px; height:30px;"><b>${p.user}</b>
+                        </div>
+                        <p>${p.text || ""}</p>
+                        ${p.url ? `<img src="${p.url}" class="post-img">` : ""}
+                    </div>`;
                 });
             });
         }
 
-        // CHATS & SEARCH
+        // CHATS
         document.getElementById('searchUser').oninput = async (e) => {
             const val = e.target.value.toLowerCase().trim();
             const resBox = document.getElementById('searchRes');
@@ -272,7 +236,7 @@
                     const u = doc.data();
                     if(u.uid === user.uid) return;
                     resBox.innerHTML += `<div class="user-row" onclick="openChat('${u.uid}', '${u.nick}', '${u.avatar}')">
-                        <img src="${u.avatar}" class="ava"> <div><b>${u.nick}</b></div>
+                        <img src="${u.avatar}" class="ava"> ${u.nick}
                     </div>`;
                 });
                 resBox.style.display = 'block';
@@ -284,10 +248,33 @@
             document.getElementById('chat-title').innerText = nick;
             document.getElementById('chat-ava').src = ava;
             document.getElementById('searchRes').style.display = 'none';
-            document.getElementById('searchUser').value = "";
             showScreen('msg');
             initMessages();
         };
+
+        // Тот самый список чатов как в ТГ
+        function initChatList() {
+            const q = query(collection(db, "conversations"), where("users", "array-contains", user.uid), orderBy("time", "desc"));
+            onSnapshot(q, async (snaps) => {
+                const list = document.getElementById('chat-list');
+                list.innerHTML = "";
+                for (const d of snaps.docs) {
+                    const conv = d.data();
+                    const otherId = conv.users.find(id => id !== user.uid);
+                    const userDoc = await getDoc(doc(db, "users", otherId));
+                    const otherUser = userDoc.data();
+                    if (otherUser) {
+                        list.innerHTML += `<div class="user-row card" onclick="openChat('${otherId}', '${otherUser.nick}', '${otherUser.avatar}')" style="margin-bottom:10px">
+                            <img src="${otherUser.avatar}" class="ava">
+                            <div style="flex:1">
+                                <b>${otherUser.nick}</b>
+                                <div style="font-size:12px; color:var(--s); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;">${conv.lastMsg}</div>
+                            </div>
+                        </div>`;
+                    }
+                }
+            });
+        }
 
         function initMessages() {
             onSnapshot(query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc")), (snaps) => {
@@ -296,12 +283,10 @@
                 snaps.forEach(d => {
                     const m = d.data();
                     const isMe = m.uid === user.uid;
-                    const t = m.time ? new Date(m.time.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "...";
-                    box.innerHTML += `
-                        <div class="bubble ${isMe ? 'me' : 'not-me'}">
-                            ${m.type === 'img' ? `<img src="${m.url}" style="width:100%; border-radius:12px;">` : m.text}
-                            <div class="time">${t}</div>
-                        </div>`;
+                    box.innerHTML += `<div class="bubble ${isMe ? 'me' : 'not-me'}">
+                        ${m.text}
+                        <div class="time">${m.time ? new Date(m.time.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...'}</div>
+                    </div>`;
                 });
                 box.scrollTop = box.scrollHeight;
             });
@@ -310,21 +295,21 @@
         document.getElementById('sendMsg').onclick = async () => {
             const text = document.getElementById('msgInput').value;
             if(!text.trim()) return;
-            document.getElementById('msgInput').value = "";
+            const participants = activeChatId.split('_');
+            
+            // Сообщение
             await addDoc(collection(db, "chats", activeChatId, "messages"), {
-                type: 'text', text, uid: user.uid, time: serverTimestamp()
+                text, uid: user.uid, time: serverTimestamp()
             });
-        };
 
-        // PROFILE TOOLS
-        document.getElementById('deleteAccBtn').onclick = async () => {
-            if(!confirm("Удалить аккаунт навсегда? Все ваши данные будут стерты.")) return;
-            try {
-                const u = auth.currentUser;
-                await deleteDoc(doc(db, "users", u.uid));
-                await deleteUser(u);
-                location.reload();
-            } catch (e) { alert("Need recent login to delete account. Logout and Login again."); }
+            // Обновляем список чатов
+            await setDoc(doc(db, "conversations", activeChatId), {
+                lastMsg: text,
+                time: serverTimestamp(),
+                users: participants
+            }, { merge: true });
+
+            document.getElementById('msgInput').value = "";
         };
 
         window.logout = () => signOut(auth).then(() => location.reload());
