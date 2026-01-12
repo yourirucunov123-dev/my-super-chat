@@ -3,72 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AirTalk Messenger</title>
+    <title>Directo Messenger</title>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #00ffa3; --bg: #09090b; --card: #18181b; --border: #27272a; --text: #fafafa; }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --primary: #248bf5; --bg: #0f0f0f; --card: #1c1c1e; --border: #2c2c2e; --text: #ffffff; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Auth */
-        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 28px; width: 90%; max-width: 380px; text-align: center; border: 1px solid var(--border); }
+        /* Авторизация */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--card); padding: 40px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); }
+        .auth-card h1 { font-size: 32px; font-weight: 700; margin: 0 0 10px; background: linear-gradient(45deg, #248bf5, #00ffa3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Основная сетка (Telegram Style) */
+        .sidebar { width: 320px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: #000; }
+
+        /* Моб. адаптация */
+        @media (max-width: 768px) {
+            .sidebar { display: none; } /* Позже можно сделать переключатель */
+        }
+
+        /* Список чатов */
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .chat-item { padding: 15px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #ffffff05; }
+        .chat-item:hover { background: #ffffff0a; }
+
+        /* Окно чата */
+        .chat-header { padding: 12px 20px; background: rgba(28,28,30,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+        /* Облачка сообщений */
+        .msg-row { display: flex; gap: 8px; max-width: 80%; margin-bottom: 4px; }
+        .msg-row.me { align-self: flex-end; flex-direction: row-reverse; }
+        .ava-msg { width: 30px; height: 30px; border-radius: 10px; object-fit: cover; align-self: flex-end; }
         
-        /* UI */
-        header { padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        #chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 15px; position: relative; }
+        .me .bubble { background: var(--primary); border-bottom-right-radius: 4px; }
+        .not-me .bubble { background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        .msg-img { width: 100%; max-width: 280px; border-radius: 12px; margin-top: 5px; }
+
+        /* Ввод (Скрепка тут!) */
+        .input-wrap { padding: 15px 20px; background: var(--card); display: flex; align-items: center; gap: 12px; }
+        .input-box { flex: 1; background: #09090b; border: 1px solid var(--border); border-radius: 20px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
+        .input-box input { flex: 1; background: none; border: none; color: white; outline: none; font-size: 15px; }
         
-        .msg-wrapper { display: flex; gap: 10px; max-width: 85%; align-items: flex-end; }
-        .msg-wrapper.me { flex-direction: row-reverse; align-self: flex-end; }
-        .mini-ava { width: 32px; height: 32px; border-radius: 10px; object-fit: cover; background: #333; }
-        
-        .msg-content { padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
-        .me .msg-content { background: var(--accent); color: #000; border-bottom-right-radius: 2px; }
-        .not-me .msg-content { background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 2px; }
+        .btn-icon { color: #a1a1aa; cursor: pointer; display: flex; align-items: center; transition: 0.2s; }
+        .btn-icon:hover { color: var(--primary); }
+        .btn-send { background: var(--primary); color: white; width: 38px; height: 38px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* Фото в чате */
-        .chat-img { width: 100%; max-width: 250px; border-radius: 12px; margin-top: 5px; display: block; cursor: pointer; }
+        /* Инпуты авторизации */
+        .field { width: 100%; background: #09090b; border: 1px solid var(--border); padding: 14px; border-radius: 14px; color: white; margin-bottom: 10px; }
+        .btn-blue { width: 100%; background: var(--primary); color: white; padding: 14px; border-radius: 14px; border: none; font-weight: 600; cursor: pointer; }
 
-        /* Ввод */
-        .input-bar { padding: 15px; background: var(--card); display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--border); }
-        .input-bar input { flex: 1; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 12px; }
-        .icon-btn { background: none; border: none; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; }
-        .send-btn { background: var(--accent); color: #000; width: 45px; height: 45px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-        #loading-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); width: 0%; transition: 0.3s; z-index: 100; }
+        /* Профиль Модалка */
+        #prof-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .prof-card { background: var(--card); padding: 30px; border-radius: 30px; width: 320px; text-align: center; border: 1px solid var(--border); }
+        .profile-pic { width: 100px; height: 100px; border-radius: 35px; object-fit: cover; margin-bottom: 15px; border: 3px solid var(--primary); cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loading-bar"></div>
-
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color:var(--accent)">AirTalk</h1>
-            <input type="email" id="email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:#000; border:1px solid #333; color:#fff">
-            <input type="password" id="pass" placeholder="Пароль" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:#000; border:1px solid #333; color:#fff">
-            <div id="reg-box" style="display:none">
-                <input type="text" id="nick" placeholder="Ваше имя" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:#000; border:1px solid #333; color:#fff">
+            <h1>Directo</h1>
+            <p style="color: #8e8e93; margin-bottom: 30px;">Твой новый мессенджер</p>
+            <input type="email" id="email" class="field" placeholder="Email">
+            <input type="password" id="pass" class="field" placeholder="Пароль">
+            <div id="reg-fields" style="display:none">
+                <input type="text" id="nick" class="field" placeholder="Как вас зовут?">
             </div>
-            <button class="send-btn" id="authBtn" style="width:100%; font-weight:bold">Войти</button>
-            <p id="toggle" style="margin-top:15px; font-size:12px; color:var(--accent); cursor:pointer">Создать аккаунт</p>
+            <button class="btn-blue" id="authBtn">Войти</button>
+            <p id="toggleAuth" style="color: var(--primary); font-size: 14px; margin-top: 20px; cursor: pointer;">Создать аккаунт</p>
         </div>
     </div>
 
-    <header>
-        <div style="font-weight:bold; color:var(--accent)">AIRTALK Messenger</div>
-        <img id="myAva" src="" style="width:35px; height:35px; border-radius:10px; background:#333; cursor:pointer" onclick="logout()">
-    </header>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 style="font-size: 20px; margin: 0;">Directo</h2>
+            <div id="openProf" style="cursor:pointer"><i data-lucide="settings" size="20"></i></div>
+        </div>
+        <div class="chat-item">
+            <div style="width:48px; height:48px; background: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="users"></i>
+            </div>
+            <div>
+                <div style="font-weight: 600;">Общий чат</div>
+                <div style="font-size: 13px; color: #8e8e93;">Directo Community</div>
+            </div>
+        </div>
+    </div>
 
-    <div id="chat-messages"></div>
+    <div class="chat-area">
+        <div class="chat-header">
+            <div style="width:35px; height:35px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="users" size="18"></i>
+            </div>
+            <div style="font-weight: 600;">Общий чат</div>
+        </div>
 
-    <div class="input-bar">
-        <label class="icon-btn">
-            <i data-lucide="paperclip"></i>
-            <input type="file" id="imgSend" hidden accept="image/*">
-        </label>
-        <input type="text" id="mInput" placeholder="Сообщение...">
-        <button class="send-btn" id="sendBtn"><i data-lucide="send"></i></button>
+        <div id="messages"></div>
+
+        <div class="input-wrap">
+            <div class="input-box">
+                <label class="btn-icon">
+                    <i data-lucide="paperclip" size="20"></i>
+                    <input type="file" id="fileInp" hidden accept="image/*">
+                </label>
+                <input type="text" id="msgInp" placeholder="Сообщение...">
+            </div>
+            <button class="btn-send" id="sendBtn">
+                <i data-lucide="arrow-up" size="20"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="prof-modal">
+        <div class="prof-card">
+            <label>
+                <img id="pPic" src="" class="profile-pic">
+                <input type="file" id="avaInp" hidden accept="image/*">
+            </label>
+            <h3 id="pNick" style="margin: 0 0 5px;">...</h3>
+            <p id="pEmail" style="font-size: 13px; color: #8e8e93; margin-bottom: 25px;">...</p>
+            <button class="btn-blue" onclick="location.reload()">Обновить</button>
+            <button class="btn-blue" style="background:#ff3b30; margin-top:10px;" id="logoutBtn">Выйти</button>
+            <p style="margin-top: 15px; font-size: 12px; color: #8e8e93; cursor:pointer;" onclick="closeProf()">Закрыть</button>
+        </div>
     </div>
 
     <script type="module">
@@ -93,11 +155,11 @@
         let isReg = false;
         lucide.createIcons();
 
-        // АВТОРИЗАЦИЯ
-        document.getElementById('toggle').onclick = () => {
+        // --- AUTH ---
+        document.getElementById('toggleAuth').onclick = () => {
             isReg = !isReg;
-            document.getElementById('reg-box').style.display = isReg ? 'block' : 'none';
-            document.getElementById('authBtn').innerText = isReg ? 'Создать' : 'Войти';
+            document.getElementById('reg-fields').style.display = isReg ? 'block' : 'none';
+            document.getElementById('authBtn').innerText = isReg ? 'Создать аккаунт' : 'Войти';
         };
 
         document.getElementById('authBtn').onclick = async () => {
@@ -106,68 +168,59 @@
                 if(isReg) {
                     const n = document.getElementById('nick').value;
                     const res = await createUserWithEmailAndPassword(auth, e, p);
-                    await updateProfile(res.user, { displayName: n, photoURL: `https://api.dicebear.com/7.x/identicon/svg?seed=${n}` });
+                    await updateProfile(res.user, { displayName: n, photoURL: `https://api.dicebear.com/7.x/avataaars/svg?seed=${n}` });
                 } else { await signInWithEmailAndPassword(auth, e, p); }
-                location.reload();
-            } catch (err) { alert(err.message); }
+            } catch (err) { alert("Ошибка! Проверьте данные"); }
         };
 
         onAuthStateChanged(auth, (user) => {
             if(user) {
                 document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('myAva').src = user.photoURL;
+                document.getElementById('pPic').src = user.photoURL;
+                document.getElementById('pNick').innerText = user.displayName;
+                document.getElementById('pEmail').innerText = user.email;
                 initChat();
             } else { document.getElementById('auth-screen').style.display = 'flex'; }
         });
 
-        // ЗАГРУЗКА НА IMGBB (POST REQUEST)
-        async function uploadImage(file) {
-            document.getElementById('loading-bar').style.width = '50%';
-            const formData = new FormData();
-            formData.append("image", file);
-            
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-                method: "POST",
-                body: formData
-            });
+        // --- IMGBB UPLOAD ---
+        async function upload(file) {
+            const form = new FormData();
+            form.append("image", file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: form });
             const data = await res.json();
-            document.getElementById('loading-bar').style.width = '100%';
-            setTimeout(() => document.getElementById('loading-bar').style.width = '0%', 500);
             return data.data.url;
         }
 
-        // ОТПРАВКА ФОТО В ЧАТ
-        document.getElementById('imgSend').onchange = async (e) => {
+        document.getElementById('fileInp').onchange = async (e) => {
             const file = e.target.files[0];
             if(!file) return;
-            const url = await uploadImage(file);
-            await addDoc(collection(db, "messages"), {
-                type: "image",
-                url: url,
-                user: auth.currentUser.displayName,
-                avatar: auth.currentUser.photoURL,
-                uid: auth.currentUser.uid,
-                time: serverTimestamp()
-            });
+            const url = await upload(file);
+            await addDoc(collection(db, "messages"), { type: "img", url, user: auth.currentUser.displayName, ava: auth.currentUser.photoURL, uid: auth.currentUser.uid, time: serverTimestamp() });
         };
 
-        // ЧАТ
+        document.getElementById('avaInp').onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const url = await upload(file);
+            await updateProfile(auth.currentUser, { photoURL: url });
+            document.getElementById('pPic').src = url;
+        };
+
+        // --- CHAT LOGIC ---
         function initChat() {
             onSnapshot(query(collection(db, "messages"), orderBy("time", "asc")), (snaps) => {
-                const box = document.getElementById('chat-messages');
+                const box = document.getElementById('messages');
                 box.innerHTML = "";
                 snaps.forEach(d => {
                     const m = d.data();
                     const isMe = m.uid === auth.currentUser.uid;
-                    const content = m.type === "image" 
-                        ? `<img src="${m.url}" class="chat-img">` 
-                        : `<div>${m.text}</div>`;
-
+                    const content = m.type === "img" ? `<img src="${m.url}" class="msg-img">` : m.text;
                     box.innerHTML += `
-                        <div class="msg-wrapper ${isMe ? 'me' : 'not-me'}">
-                            <img src="${m.avatar}" class="mini-ava">
-                            <div class="msg-content">
-                                <div style="font-size:9px; opacity:0.5; margin-bottom:4px">${m.user}</div>
+                        <div class="msg-row ${isMe ? 'me' : 'not-me'}">
+                            <img src="${m.ava}" class="ava-msg">
+                            <div class="bubble">
+                                <div style="font-size:10px; opacity:0.6; margin-bottom:2px">${m.user}</div>
                                 ${content}
                             </div>
                         </div>`;
@@ -177,16 +230,16 @@
         }
 
         document.getElementById('sendBtn').onclick = async () => {
-            const val = document.getElementById('mInput').value;
+            const val = document.getElementById('msgInp').value;
             if(!val.trim()) return;
-            await addDoc(collection(db, "messages"), {
-                type: "text", text: val, user: auth.currentUser.displayName, 
-                avatar: auth.currentUser.photoURL, uid: auth.currentUser.uid, time: serverTimestamp()
-            });
-            document.getElementById('mInput').value = "";
+            await addDoc(collection(db, "messages"), { type: "text", text: val, user: auth.currentUser.displayName, ava: auth.currentUser.photoURL, uid: auth.currentUser.uid, time: serverTimestamp() });
+            document.getElementById('msgInp').value = "";
         };
 
-        window.logout = () => signOut(auth).then(() => location.reload());
+        // --- UI UI ---
+        document.getElementById('openProf').onclick = () => document.getElementById('prof-modal').style.display = 'flex';
+        window.closeProf = () => document.getElementById('prof-modal').style.display = 'none';
+        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
     </script>
 </body>
 </html>
