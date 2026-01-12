@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirUSB Cloud Chat</title>
+    <style>
+        :root { --primary: #00ff88; --bg: #0a0a0a; --panel: #161616; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        
+        /* Шапка */
+        header { background: var(--panel); padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; color: var(--primary); }
+
+        /* Окно сообщений */
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { background: #222; padding: 10px 15px; border-radius: 15px; max-width: 80%; align-self: flex-start; word-wrap: break-word; }
+        .msg.me { background: #004d33; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg b { display: block; font-size: 0.8em; margin-bottom: 4px; color: var(--primary); }
+
+        /* Поле ввода */
+        .input-area { background: var(--panel); padding: 20px; display: flex; gap: 10px; border-top: 1px solid #333; }
+        input { flex: 1; background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 25px; outline: none; }
+        button { background: var(--primary); color: #000; border: none; padding: 0 20px; border-radius: 25px; font-weight: bold; cursor: pointer; }
+
+        /* Окно входа */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2 style="color:var(--primary)">AirUSB Live Chat</h2>
+        <input type="text" id="nickInput" placeholder="Введите ваш ник..." style="width: 250px;">
+        <button id="startBtn" style="height: 45px; width: 275px;">Войти в чат</button>
+    </div>
+
+    <header>AirUSB ONLINE</header>
+    <div id="chat"></div>
+
+    <div class="input-area">
+        <input type="text" id="msgText" placeholder="Сообщение...">
+        <button id="sendBtn">➤</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Твои данные, которые ты скинул
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdOZrTcE4ATDlGldnW8_dWRmHuaUuJfak",
+            authDomain: "mysuperchat-d1c29.firebaseapp.com",
+            projectId: "mysuperchat-d1c29",
+            storageBucket: "mysuperchat-d1c29.firebasestorage.app",
+            messagingSenderId: "299888628640",
+            appId: "1:299888628640:web:caf0535b94e389c7948ac5",
+            measurementId: "G-MK6282PYMM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const messagesCol = collection(db, "global_chat");
+
+        let myNick = "";
+
+        // Логика входа
+        document.getElementById('startBtn').onclick = () => {
+            myNick = document.getElementById('nickInput').value.trim();
+            if(myNick) {
+                document.getElementById('login-screen').style.display = 'none';
+                loadMessages();
+            } else {
+                alert("Пожалуйста, введите ник!");
+            }
+        };
+
+        // Отправка сообщения
+        async function sendMsg() {
+            const text = document.getElementById('msgText').value.trim();
+            if(!text) return;
+
+            await addDoc(messagesCol, {
+                user: myNick,
+                text: text,
+                time: serverTimestamp()
+            });
+            document.getElementById('msgText').value = "";
+        }
+
+        document.getElementById('sendBtn').onclick = sendMsg;
+        document.getElementById('msgText').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
+
+        // Получение сообщений
+        function loadMessages() {
+            const q = query(messagesCol, orderBy("time", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const chatBox = document.getElementById('chat');
+                chatBox.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const isMe = data.user === myNick;
+                    const div = document.createElement('div');
+                    div.className = `msg ${isMe ? 'me' : ''}`;
+                    div.innerHTML = `<b>${data.user}</b>${data.text}`;
+                    chatBox.appendChild(div);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+    </script>
+</body>
+</html>
