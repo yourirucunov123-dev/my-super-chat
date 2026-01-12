@@ -6,61 +6,59 @@
     <meta name="theme-color" content="#18181b">
     <title>Directo Pro</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --p: #248bf5; --bg: #09090b; --c: #18181b; --b: #27272a; --t: #fafafa; --s: #a1a1aa; --danger: #ef4444; 
             --safe-bottom: 25px; 
         }
         [data-theme="light"] { --bg: #f4f4f5; --c: #ffffff; --b: #e4e4e7; --t: #09090b; --s: #71717a; }
-        
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg); color: var(--t); transition: background 0.3s; }
         body { display: flex; flex-direction: column; position: fixed; inset: 0; }
-
-        /* Экраны */
-        .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; animation: fadeIn 0.2s ease; }
+        
+        /* Анимации появления экранов */
+        .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top, 0px); animation: fadeIn 0.3s ease; }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header { padding: 15px 20px; background: var(--c); border-bottom: 1px solid var(--b); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
-        .content-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
-
-        /* Карточки и Элементы */
-        .card { background: var(--c); border: 1px solid var(--b); border-radius: 20px; padding: 15px; position: relative; }
-        .ava { width: 48px; height: 48px; border-radius: 16px; object-fit: cover; background: var(--b); flex-shrink: 0; transition: 0.3s; }
-        .ava:active { transform: scale(0.9); }
+        .nav-bar { background: var(--c); border-top: 1px solid var(--b); display: flex; justify-content: space-around; padding: 10px 0 calc(5px + var(--safe-bottom)); z-index: 1000; flex-shrink: 0; }
+        .nav-item { color: var(--s); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 4px; flex: 1; transition: 0.2s; }
+        .nav-item.active { color: var(--p); transform: translateY(-2px); }
         
-        .input-field { flex: 1; background: var(--bg); border: 1px solid var(--b); color: var(--t); padding: 12px 18px; border-radius: 25px; font-size: 15px; transition: border 0.2s; }
-        .input-field:focus { border-color: var(--p); }
+        .header { padding: 15px 20px; background: var(--c); border-bottom: 1px solid var(--b); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .content-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+        
+        .chat-item { background: var(--c); border-radius: 15px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid var(--b); transition: 0.2s; }
+        .chat-item:active { transform: scale(0.98); background: var(--b); }
+        
+        .card { background: var(--c); border: 1px solid var(--b); border-radius: 20px; padding: 15px; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; scale: 0.95; } to { opacity: 1; scale: 1; } }
+        
+        .post-img { width: 100%; border-radius: 14px; margin-top: 12px; object-fit: cover; max-height: 400px; background: var(--b); }
+        .input-zone { padding: 10px 15px calc(10px + var(--safe-bottom)); background: var(--c); border-top: 1px solid var(--b); display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+        .input-field { flex: 1; background: var(--bg); border: 1px solid var(--b); color: var(--t); padding: 12px 18px; border-radius: 25px; font-size: 15px; }
+        
+        .btn-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--p); border: none; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
+        .btn-circle:active { transform: scale(0.9); }
+        .btn-circle:disabled { background: var(--s); opacity: 0.6; cursor: not-allowed; }
 
-        .btn-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--p); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        .btn-circle:disabled { opacity: 0.5; filter: grayscale(1); }
-
-        /* Чат */
-        .bubble { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 15px; position: relative; margin-bottom: 4px; }
-        .bubble img { width: 100%; border-radius: 12px; margin-top: 5px; }
+        .ava { width: 48px; height: 48px; border-radius: 16px; object-fit: cover; background: var(--b); flex-shrink: 0; }
+        .bubble { max-width: 80%; padding: 8px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-wrap: break-word; display: flex; flex-direction: column; margin-bottom: 4px; }
         .bubble.me { align-self: flex-end; background: var(--p); color: white; border-bottom-right-radius: 4px; }
         .bubble.not-me { align-self: flex-start; background: var(--b); border-bottom-left-radius: 4px; }
-        .msg-time { font-size: 10px; opacity: 0.7; align-self: flex-end; margin-top: 4px; display: block; }
-
-        /* Навигация */
-        .nav-bar { background: var(--c); border-top: 1px solid var(--b); display: flex; justify-content: space-around; padding: 10px 0 calc(5px + var(--safe-bottom)); flex-shrink: 0; }
-        .nav-item { color: var(--s); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 4px; flex: 1; }
-        .nav-item.active { color: var(--p); font-weight: 600; }
-
-        /* Пустые состояния */
-        .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--s); text-align: center; gap: 10px; }
         
-        /* Загрузчик */
-        .loader { width: 20px; height: 20px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .search-res { position: absolute; top: 70px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 15px; z-index: 500; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        
+        .spin { animation: rotation 1s infinite linear; }
+        @keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <div class="card" style="width:90%; max-width:350px; text-align:center;">
+        <div class="card" style="width:100%; max-width:350px; text-align:center;">
             <h1 style="color:var(--p); font-size: 40px; margin: 0 0 20px 0;">Directo</h1>
             <input type="email" id="email" placeholder="Email" class="input-field" style="width:100%; margin-bottom:10px;">
             <input type="password" id="pass" placeholder="Пароль" class="input-field" style="width:100%; margin-bottom:10px;">
@@ -74,7 +72,7 @@
 
     <div id="scr-feed" class="screen active">
         <div class="header">Лента <i data-lucide="plus-circle" id="addPostBtn" style="cursor:pointer"></i></div>
-        <div id="post-input-area" style="display:none; padding:15px; background:var(--c); border-bottom:1px solid var(--b);">
+        <div id="post-input" style="display:none; padding:15px; background:var(--c); border-bottom:1px solid var(--b);">
             <div style="display:flex; gap:10px; align-items:center;">
                 <label class="btn-circle" style="background:var(--b); width:40px; height:40px;">
                     <i data-lucide="image" size="18"></i>
@@ -83,7 +81,7 @@
                 <input type="text" id="postText" placeholder="Что нового?" class="input-field">
                 <button class="btn-circle" id="sendPost" style="width:40px; height:40px;"><i data-lucide="send" size="18"></i></button>
             </div>
-            <div id="post-preview" style="margin-top:10px; display:none; color:var(--p); font-size:12px;">Фото выбрано</div>
+            <div id="file-name" style="font-size: 11px; color: var(--p); margin-top: 5px; margin-left: 50px;"></div>
         </div>
         <div class="content-scroll" id="feed-items"></div>
     </div>
@@ -91,11 +89,11 @@
     <div id="scr-chats" class="screen">
         <div class="header">Чаты</div>
         <div style="padding:15px; position:relative;">
-            <div style="display:flex; align-items:center; background:var(--c); border-radius:20px; padding:0 15px; border:1px solid var(--b)">
+            <div style="display:flex; align-items:center; background:var(--c); border-radius:15px; padding:0 15px; border:1px solid var(--b)">
                 <i data-lucide="search" size="18" style="color:var(--s)"></i>
-                <input type="text" id="searchUser" placeholder="Поиск людей..." class="input-field" style="border:none; background:transparent;">
+                <input type="text" id="searchUser" placeholder="Поиск пользователей..." class="input-field" style="border:none; background:transparent;">
             </div>
-            <div class="search-res" id="searchRes" style="position:absolute; top:70px; left:15px; right:15px; background:var(--c); border-radius:15px; z-index:100; border:1px solid var(--b); display:none; max-height:200px; overflow-y:auto;"></div>
+            <div class="search-res" id="searchRes"></div>
         </div>
         <div class="content-scroll" id="chat-list"></div>
     </div>
@@ -110,32 +108,19 @@
         </div>
         <div class="content-scroll" id="messages-box"></div>
         <div class="input-zone">
-            <label class="btn-circle" style="background:transparent; color:var(--s); width:30px;">
-                <i data-lucide="paperclip" size="20"></i>
-                <input type="file" id="msgFile" hidden accept="image/*">
-            </label>
             <input type="text" id="msgInput" placeholder="Сообщение..." class="input-field">
-            <button id="emojiBtn" style="background:none; border:none; font-size:20px; cursor:pointer;">😊</button>
             <button class="btn-circle" id="sendMsg"><i data-lucide="arrow-up"></i></button>
         </div>
     </div>
 
     <div id="scr-prof" class="screen">
         <div class="header">Профиль</div>
-        <div class="content-scroll" style="align-items:center;">
-            <div style="position:relative;">
-                <img id="myPic" class="ava" style="width:120px; height:120px; border-radius:40px; border:4px solid var(--p);">
-                <label style="position:absolute; bottom:0; right:0; background:var(--p); padding:8px; border-radius:50%; cursor:pointer; color:#fff;">
-                    <i data-lucide="camera" size="16"></i>
-                    <input type="file" id="changeAva" hidden accept="image/*">
-                </label>
-            </div>
-            <h2 id="myNickDisplay" style="margin: 15px 0 5px 0;">Username</h2>
-            <p id="myEmailDisplay" style="color:var(--s); margin-bottom:20px; font-size:14px;">email@site.com</p>
-            
-            <button class="card" onclick="toggleTheme()" style="width:100%; display:flex; justify-content:space-between; cursor:pointer;">Тема <i data-lucide="moon"></i></button>
-            <button class="card" onclick="logout()" style="width:100%; margin-top:10px; cursor:pointer;">Выйти</button>
-            <button id="deleteAccBtn" style="margin-top:20px; color:var(--danger); background:none; border:none; cursor:pointer;">Удалить аккаунт</button>
+        <div class="content-scroll" style="align-items:center; text-align: center;">
+            <img id="myPic" class="ava" style="width:100px; height:100px; border-radius:35px; border:3px solid var(--p); margin-top: 20px;">
+            <h2 id="myNickDisplay" style="margin: 15px 0;">Username</h2>
+            <button class="card" onclick="toggleTheme()" style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; cursor:pointer;">Тема <i data-lucide="moon"></i></button>
+            <button class="card" onclick="logout()" style="width:100%; margin-bottom: 10px; cursor:pointer;">Выйти</button>
+            <button class="card" id="deleteAccBtn" style="width:100%; color:var(--danger); border-color:var(--danger); cursor:pointer;">Удалить аккаунт</button>
         </div>
     </div>
 
@@ -174,20 +159,6 @@
             return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        async function uploadImage(file) {
-            if(!file) return null;
-            const fd = new FormData();
-            fd.append("image", file);
-            try {
-                const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-                const d = await r.json();
-                return d.data.url;
-            } catch (e) {
-                alert("Ошибка загрузки фото");
-                return null;
-            }
-        }
-
         window.showScreen = (id, el) => {
             if (msgUnsub && id !== 'msg') { msgUnsub(); msgUnsub = null; }
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -211,18 +182,15 @@
             if(!e || !p) return;
             const btn = document.getElementById('authBtn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span>';
-
             try {
                 if(document.getElementById('reg-box').style.display === 'block') {
                     const n = document.getElementById('nick').value;
                     const res = await createUserWithEmailAndPassword(auth, e, p);
                     const ava = `https://api.dicebear.com/7.x/identicon/svg?seed=${n}`;
                     await updateProfile(res.user, { displayName: n, photoURL: ava });
-                    await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, nick: n.toLowerCase(), avatar: ava, email: e });
+                    await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, nick: n.toLowerCase(), avatar: ava });
                 } else { await signInWithEmailAndPassword(auth, e, p); }
-            } catch (err) { alert("Ошибка: " + err.message); }
-            btn.disabled = false; btn.innerText = "Продолжить";
+            } catch (err) { alert(err.message); btn.disabled = false; }
         };
 
         onAuthStateChanged(auth, u => {
@@ -231,85 +199,81 @@
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('myPic').src = u.photoURL;
                 document.getElementById('myNickDisplay').innerText = u.displayName;
-                document.getElementById('myEmailDisplay').innerText = u.email;
                 initFeed();
                 initChatList();
             } else { document.getElementById('auth-screen').style.display = 'flex'; }
         });
 
+        // --- UPLOAD IMAGE ---
+        async function upload(file) {
+            if(!file) return null;
+            const fd = new FormData(); fd.append("image", file);
+            try {
+                const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+                const d = await r.json();
+                return d.success ? d.data.url : null;
+            } catch (e) { return null; }
+        }
+
         // --- FEED ---
         function initFeed() {
-            onSnapshot(query(collection(db, "feed"), orderBy("time", "desc"), limit(30)), (snaps) => {
-                const box = document.getElementById('feed-items');
-                if(snaps.empty) {
-                    box.innerHTML = `<div class="empty-state"><i data-lucide="layout" size="48"></i><p>Лента пуста.<br>Напишите что-нибудь!</p></div>`;
-                    lucide.createIcons(); return;
-                }
-                box.innerHTML = "";
+            onSnapshot(query(collection(db, "feed"), orderBy("time", "desc"), limit(20)), (snaps) => {
+                const box = document.getElementById('feed-items'); box.innerHTML = "";
                 snaps.forEach(d => {
                     const p = d.data();
-                    const isMyPost = p.uid === user.uid;
-                    box.innerHTML += `
-                    <div class="card">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <img src="${p.ava}" class="ava" style="width:32px; height:32px;">
-                                <b>${p.user}</b>
-                            </div>
-                            ${isMyPost ? `<i data-lucide="trash-2" size="16" onclick="deletePost('${d.id}')" style="color:var(--danger); cursor:pointer"></i>` : ""}
+                    box.innerHTML += `<div class="card">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                            <img src="${p.ava}" class="ava" style="width:30px; height:30px;"><b>${p.user}</b>
                         </div>
                         <p style="margin:0">${p.text || ""}</p>
-                        ${p.url ? `<img src="${p.url}" class="post-img" style="width:100%; border-radius:12px; margin-top:10px;">` : ""}
+                        ${p.url ? `<img src="${p.url}" class="post-img">` : ""}
                     </div>`;
                 });
-                lucide.createIcons();
             });
         }
 
-        window.deletePost = async (id) => {
-            if(confirm("Удалить этот пост?")) await deleteDoc(doc(db, "feed", id));
+        document.getElementById('postFile').onchange = (e) => {
+            document.getElementById('file-name').innerText = e.target.files[0] ? "Выбрано фото" : "";
         };
 
         document.getElementById('addPostBtn').onclick = () => {
-            const p = document.getElementById('post-input-area');
+            const p = document.getElementById('post-input');
             p.style.display = p.style.display === 'none' ? 'block' : 'none';
         };
 
-        document.getElementById('postFile').onchange = (e) => {
-            document.getElementById('post-preview').style.display = e.target.files[0] ? 'block' : 'none';
-        };
-
         document.getElementById('sendPost').onclick = async () => {
-            const t = document.getElementById('postText'), f = document.getElementById('postFile');
-            if(!t.value && !f.files[0]) return;
             const btn = document.getElementById('sendPost');
-            btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+            const t = document.getElementById('postText');
+            const f = document.getElementById('postFile');
+            if(!t.value && !f.files[0]) return;
+            
+            btn.disabled = true;
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="spin" size="18"></i>';
+            lucide.createIcons();
 
-            const url = await uploadImage(f.files[0]);
-            await addDoc(collection(db, "feed"), { 
-                text: t.value, url: url || "", 
-                user: user.displayName, ava: user.photoURL, uid: user.uid,
-                time: serverTimestamp() 
-            });
-
+            const url = await upload(f.files[0]);
+            await addDoc(collection(db, "feed"), { text: t.value, url: url || "", user: user.displayName, ava: user.photoURL, time: serverTimestamp() });
+            
             t.value = ""; f.value = ""; 
-            document.getElementById('post-input-area').style.display = 'none';
-            document.getElementById('post-preview').style.display = 'none';
-            btn.disabled = false; btn.innerHTML = '<i data-lucide="send" size="18"></i>';
+            document.getElementById('file-name').innerText = "";
+            document.getElementById('post-input').style.display = 'none';
+            btn.disabled = false;
+            btn.innerHTML = originalIcon;
             lucide.createIcons();
         };
 
-        // --- MESSAGES ---
+        // --- SEARCH & CHATS ---
         document.getElementById('searchUser').oninput = async (e) => {
             const val = e.target.value.toLowerCase().trim();
             const resBox = document.getElementById('searchRes');
             if(val.length < 2) { resBox.style.display = 'none'; return; }
             const qU = query(collection(db, "users"), where("nick", ">=", val), limit(5));
-            const snaps = await getDocs(qU);
+            const snap = await getDocs(qU);
             resBox.innerHTML = "";
-            snaps.forEach(s => {
+            snap.forEach(s => {
                 const u = s.data(); if(u.uid === user.uid) return;
-                const row = document.createElement('div');
+                const row = document.createElement('div'); row.className = 'user-row';
                 row.style = "padding:12px; display:flex; align-items:center; gap:12px; cursor:pointer; border-bottom:1px solid var(--b)";
                 row.innerHTML = `<img src="${u.avatar}" class="ava" style="width:30px;height:30px"> <span>${u.nick}</span>`;
                 row.onclick = () => openChat(u.uid, u.nick, u.avatar);
@@ -328,60 +292,10 @@
             initMessages();
         };
 
-        function initMessages() {
-            if(msgUnsub) msgUnsub();
-            const qM = query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc"));
-            const box = document.getElementById('messages-box');
-            
-            msgUnsub = onSnapshot(qM, (snaps) => {
-                if(snaps.empty) {
-                    box.innerHTML = `<div class="empty-state"><h3>👋 Начните общение!</h3><p>Отправьте приветствие первым.</p></div>`;
-                    return;
-                }
-                box.innerHTML = "";
-                snaps.forEach(d => {
-                    const m = d.data();
-                    const b = document.createElement('div');
-                    b.className = `bubble ${m.uid === user.uid ? 'me' : 'not-me'}`;
-                    let content = m.text ? `<div>${m.text}</div>` : "";
-                    if(m.url) content += `<img src="${m.url}" onclick="window.open('${m.url}')">`;
-                    b.innerHTML = `${content}<span class="msg-time">${fmtTime(m.time)}</span>`;
-                    box.appendChild(b);
-                });
-                box.scrollTop = box.scrollHeight;
-            });
-        }
-
-        document.getElementById('sendMsg').onclick = async () => sendMsgLogic();
-        document.getElementById('msgInput').onkeydown = (e) => { if(e.key === 'Enter') sendMsgLogic(); };
-
-        async function sendMsgLogic() {
-            const input = document.getElementById('msgInput'), f = document.getElementById('msgFile');
-            const txt = input.value.trim();
-            if(!txt && !f.files[0]) return;
-            const cid = activeChatId;
-            input.value = ""; 
-
-            const url = await uploadImage(f.files[0]);
-            f.value = "";
-
-            await addDoc(collection(db, "chats", cid, "messages"), { 
-                text: txt, url: url || "", uid: user.uid, time: serverTimestamp() 
-            });
-
-            await setDoc(doc(db, "conversations", cid), { 
-                lastMsg: txt || "📷 Фотография", time: serverTimestamp(), users: cid.split('_') 
-            }, { merge: true });
-        }
-
         function initChatList() {
             const q = query(collection(db, "conversations"), where("users", "array-contains", user.uid), orderBy("time", "desc"));
             onSnapshot(q, async (snaps) => {
                 const list = document.getElementById('chat-list');
-                if(snaps.empty) {
-                    list.innerHTML = `<div class="empty-state"><p>У вас пока нет чатов.<br>Найдите кого-нибудь через поиск!</p></div>`;
-                    return;
-                }
                 list.innerHTML = "";
                 for (const d of snaps.docs) {
                     const conv = d.data();
@@ -390,57 +304,60 @@
                     if (!uDoc.exists()) continue;
                     const other = uDoc.data();
                     const item = document.createElement('div');
-                    item.className = 'chat-item card';
-                    item.style = "display:flex; align-items:center; gap:12px; margin-bottom:10px; cursor:pointer;";
+                    item.className = 'chat-item';
+                    item.style.marginBottom = "10px";
                     item.onclick = () => openChat(otherId, other.nick, other.avatar);
                     item.innerHTML = `
-                        <img src="${other.avatar}" class="ava" style="width:45px; height:45px;">
-                        <div style="flex:1; overflow:hidden;">
+                        <img src="${other.avatar}" class="ava">
+                        <div class="chat-info" style="flex:1">
                             <div style="display:flex; justify-content:space-between;"><b>${other.nick}</b><span style="font-size:10px; color:var(--s)">${fmtTime(conv.time)}</span></div>
-                            <div style="font-size:13px; color:var(--s); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${conv.lastMsg}</div>
+                            <div style="font-size:13px; color:var(--s); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${conv.lastMsg || "..." }</div>
                         </div>`;
                     list.appendChild(item);
                 }
             });
         }
 
-        // --- PROFILE & SETTINGS ---
-        document.getElementById('changeAva').onchange = async (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            document.getElementById('myPic').style.opacity = "0.5";
-            const url = await uploadImage(file);
-            if(url) {
-                await updateProfile(auth.currentUser, { photoURL: url });
-                await setDoc(doc(db, "users", user.uid), { avatar: url }, { merge: true });
-                document.getElementById('myPic').src = url;
-            }
-            document.getElementById('myPic').style.opacity = "1";
-        };
+        function initMessages() {
+            if(msgUnsub) msgUnsub();
+            const qM = query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc"));
+            msgUnsub = onSnapshot(qM, (snaps) => {
+                const box = document.getElementById('messages-box');
+                box.innerHTML = "";
+                snaps.forEach(d => {
+                    const m = d.data();
+                    const b = document.createElement('div');
+                    b.className = `bubble ${m.uid === user.uid ? 'me' : 'not-me'}`;
+                    b.innerHTML = `${m.text}<span style="font-size:9px; opacity:0.6; align-self:flex-end;">${fmtTime(m.time)}</span>`;
+                    box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
 
-        document.getElementById('emojiBtn').onclick = () => {
-            document.getElementById('msgInput').focus();
-            // На мобильных это вызовет клавиатуру с эмодзи
-        };
-
-        window.toggleTheme = () => {
-            const theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
-            document.body.dataset.theme = theme;
-            localStorage.setItem('theme', theme);
+        document.getElementById('sendMsg').onclick = async () => {
+            const input = document.getElementById('msgInput');
+            const txt = input.value.trim();
+            if(!txt || !activeChatId) return;
+            const cid = activeChatId;
+            input.value = "";
+            await addDoc(collection(db, "chats", cid, "messages"), { text: txt, uid: user.uid, time: serverTimestamp() });
+            await setDoc(doc(db, "conversations", cid), { lastMsg: txt, time: serverTimestamp(), users: cid.split('_') }, { merge: true });
         };
 
         window.logout = () => signOut(auth).then(() => location.reload());
-
+        window.toggleTheme = () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+        };
+        
         document.getElementById('deleteAccBtn').onclick = async () => {
-            if(confirm("Это удалит ваш аккаунт навсегда. Продолжить?")) {
+            if(confirm("Удалить аккаунт навсегда?")) {
                 await deleteDoc(doc(db, "users", user.uid));
                 await deleteUser(auth.currentUser);
                 location.reload();
             }
         };
 
-        // Инициализация темы
-        if(localStorage.getItem('theme')) document.body.dataset.theme = localStorage.getItem('theme');
         lucide.createIcons();
     </script>
 </body>
