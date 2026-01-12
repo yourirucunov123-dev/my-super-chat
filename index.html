@@ -3,140 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Directo Messenger</title>
+    <title>Directo | Private Messenger</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #248bf5; --bg: #0f0f0f; --card: #1c1c1e; --border: #2c2c2e; --text: #ffffff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
-
-        /* Авторизация */
-        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--border); }
-        .auth-card h1 { font-size: 32px; font-weight: 700; margin: 0 0 10px; background: linear-gradient(45deg, #248bf5, #00ffa3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Основная сетка (Telegram Style) */
-        .sidebar { width: 320px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: #000; }
-
-        /* Моб. адаптация */
-        @media (max-width: 768px) {
-            .sidebar { display: none; } /* Позже можно сделать переключатель */
+        :root {
+            --p: #248bf5; --bg: #000000; --c: #1c1c1e; --b: #2c2c2e; --t: #ffffff; --s: #8e8e93;
         }
+        [data-theme="light"] {
+            --bg: #f2f2f7; --c: #ffffff; --b: #e5e5ea; --t: #000000; --s: #8e8e93;
+        }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: background 0.2s, color 0.2s; }
+        body { margin: 0; background: var(--bg); color: var(--t); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Список чатов */
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .chat-item { padding: 15px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #ffffff05; }
-        .chat-item:hover { background: #ffffff0a; }
-
-        /* Окно чата */
-        .chat-header { padding: 12px 20px; background: rgba(28,28,30,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-
-        /* Облачка сообщений */
-        .msg-row { display: flex; gap: 8px; max-width: 80%; margin-bottom: 4px; }
-        .msg-row.me { align-self: flex-end; flex-direction: row-reverse; }
-        .ava-msg { width: 30px; height: 30px; border-radius: 10px; object-fit: cover; align-self: flex-end; }
+        /* Sidebar */
+        .side { width: 350px; background: var(--c); border-right: 1px solid var(--b); display: flex; flex-direction: column; z-index: 10; }
+        .side-h { padding: 15px; border-bottom: 1px solid var(--b); }
+        .logo { font-size: 22px; font-weight: 800; color: var(--p); letter-spacing: -1px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         
-        .bubble { padding: 10px 14px; border-radius: 18px; font-size: 15px; position: relative; }
-        .me .bubble { background: var(--primary); border-bottom-right-radius: 4px; }
-        .not-me .bubble { background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-        .msg-img { width: 100%; max-width: 280px; border-radius: 12px; margin-top: 5px; }
+        .search-box { background: var(--bg); border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--b); }
+        .search-box input { background: none; border: none; color: var(--t); flex: 1; outline: none; }
 
-        /* Ввод (Скрепка тут!) */
-        .input-wrap { padding: 15px 20px; background: var(--card); display: flex; align-items: center; gap: 12px; }
-        .input-box { flex: 1; background: #09090b; border: 1px solid var(--border); border-radius: 20px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
-        .input-box input { flex: 1; background: none; border: none; color: white; outline: none; font-size: 15px; }
+        .items { flex: 1; overflow-y: auto; }
+        .item { padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #ffffff05; position: relative; }
+        .item:hover { background: rgba(142, 142, 147, 0.1); }
+        .item.active { background: rgba(36, 139, 245, 0.15); }
+        .ava { width: 45px; height: 45px; border-radius: 14px; object-fit: cover; background: var(--b); }
+
+        /* Main Chat */
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; background: var(--bg); }
+        .main-h { padding: 10px 20px; background: var(--c); border-bottom: 1px solid var(--b); display: flex; align-items: center; justify-content: space-between; }
         
-        .btn-icon { color: #a1a1aa; cursor: pointer; display: flex; align-items: center; transition: 0.2s; }
-        .btn-icon:hover { color: var(--primary); }
-        .btn-send { background: var(--primary); color: white; width: 38px; height: 38px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        #msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 75%; padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; position: relative; }
+        .msg.me { align-self: flex-end; background: var(--p); color: #fff; border-bottom-right-radius: 4px; }
+        .msg.not-me { align-self: flex-start; background: var(--c); border: 1px solid var(--b); border-bottom-left-radius: 4px; }
+        .msg img { width: 100%; border-radius: 10px; margin-top: 5px; }
 
-        /* Инпуты авторизации */
-        .field { width: 100%; background: #09090b; border: 1px solid var(--border); padding: 14px; border-radius: 14px; color: white; margin-bottom: 10px; }
-        .btn-blue { width: 100%; background: var(--primary); color: white; padding: 14px; border-radius: 14px; border: none; font-weight: 600; cursor: pointer; }
+        /* Input */
+        .in-bar { padding: 15px 20px; background: var(--c); border-top: 1px solid var(--b); display: flex; align-items: center; gap: 12px; }
+        .in-box { flex: 1; background: var(--bg); border-radius: 20px; padding: 8px 15px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--b); }
+        .in-box input { flex: 1; background: none; border: none; color: var(--t); outline: none; padding: 5px 0; }
 
-        /* Профиль Модалка */
-        #prof-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .prof-card { background: var(--card); padding: 30px; border-radius: 30px; width: 320px; text-align: center; border: 1px solid var(--border); }
-        .profile-pic { width: 100px; height: 100px; border-radius: 35px; object-fit: cover; margin-bottom: 15px; border: 3px solid var(--primary); cursor: pointer; }
+        /* Overlays */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .card { background: var(--c); padding: 30px; border-radius: 25px; width: 90%; max-width: 350px; text-align: center; border: 1px solid var(--b); }
+        
+        .btn { padding: 12px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-p { background: var(--p); color: #fff; }
+        
+        @media (max-width: 768px) {
+            .side { width: 100%; position: absolute; inset: 0; }
+            .side.hide { transform: translateX(-100%); }
+            .main { width: 100%; }
+        }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h1>Directo</h1>
-            <p style="color: #8e8e93; margin-bottom: 30px;">Твой новый мессенджер</p>
-            <input type="email" id="email" class="field" placeholder="Email">
-            <input type="password" id="pass" class="field" placeholder="Пароль">
-            <div id="reg-fields" style="display:none">
-                <input type="text" id="nick" class="field" placeholder="Как вас зовут?">
-            </div>
-            <button class="btn-blue" id="authBtn">Войти</button>
-            <p id="toggleAuth" style="color: var(--primary); font-size: 14px; margin-top: 20px; cursor: pointer;">Создать аккаунт</p>
+    <div id="auth-screen" class="overlay" style="display: flex; background: var(--bg); backdrop-filter: none;">
+        <div class="card">
+            <div class="logo">Directo</div>
+            <input type="email" id="email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:var(--bg); border:1px solid var(--b); color:var(--t);">
+            <input type="password" id="pass" placeholder="Пароль" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:var(--bg); border:1px solid var(--b); color:var(--t);">
+            <div id="reg-info" style="display:none"><input type="text" id="nick" placeholder="Никнейм" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:var(--bg); border:1px solid var(--b); color:var(--t);"></div>
+            <button class="btn btn-p" id="authBtn">Войти</button>
+            <p onclick="toggleAuthMode()" id="toggleTxt" style="font-size:12px; color:var(--p); margin-top:15px; cursor:pointer;">Создать аккаунт</p>
         </div>
     </div>
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2 style="font-size: 20px; margin: 0;">Directo</h2>
-            <div id="openProf" style="cursor:pointer"><i data-lucide="settings" size="20"></i></div>
-        </div>
-        <div class="chat-item">
-            <div style="width:48px; height:48px; background: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="users"></i>
-            </div>
-            <div>
-                <div style="font-weight: 600;">Общий чат</div>
-                <div style="font-size: 13px; color: #8e8e93;">Directo Community</div>
+    <div class="side" id="sidebar">
+        <div class="side-h">
+            <div class="logo"><span>Directo</span> <div style="flex:1"></div> <button onclick="toggleTheme()" style="background:none; border:none; color:var(--s); cursor:pointer;"><i data-lucide="sun"></i></button></div>
+            <div class="search-box">
+                <i data-lucide="search" size="18" style="color:var(--s)"></i>
+                <input type="text" id="userSearch" placeholder="Поиск по нику...">
             </div>
         </div>
-    </div>
-
-    <div class="chat-area">
-        <div class="chat-header">
-            <div style="width:35px; height:35px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="users" size="18"></i>
+        <div class="items" id="chatList">
             </div>
-            <div style="font-weight: 600;">Общий чат</div>
-        </div>
-
-        <div id="messages"></div>
-
-        <div class="input-wrap">
-            <div class="input-box">
-                <label class="btn-icon">
-                    <i data-lucide="paperclip" size="20"></i>
-                    <input type="file" id="fileInp" hidden accept="image/*">
-                </label>
-                <input type="text" id="msgInp" placeholder="Сообщение...">
-            </div>
-            <button class="btn-send" id="sendBtn">
-                <i data-lucide="arrow-up" size="20"></i>
-            </button>
+        <div class="side-h" style="border-top: 1px solid var(--b); display:flex; align-items:center; gap:10px; cursor:pointer" onclick="showProf()">
+            <img id="myAva" class="ava" style="width:35px; height:35px">
+            <div style="font-size:14px; font-weight:600" id="myNick">...</div>
         </div>
     </div>
 
-    <div id="prof-modal">
-        <div class="prof-card">
-            <label>
-                <img id="pPic" src="" class="profile-pic">
+    <div class="main">
+        <div class="main-h">
+            <div style="display:flex; align-items:center; gap:12px">
+                <button onclick="backToSidebar()" id="backBtn" style="background:none; border:none; color:var(--t); display:none"><i data-lucide="chevron-left"></i></button>
+                <img id="chatAva" class="ava" style="width:38px; height:38px; display:none">
+                <div>
+                    <div id="chatName" style="font-weight:600">Выберите чат</div>
+                    <div id="chatStatus" style="font-size:11px; color:var(--p)"></div>
+                </div>
+            </div>
+            <i data-lucide="more-vertical" style="color:var(--s)"></i>
+        </div>
+
+        <div id="msgs"></div>
+
+        <div class="in-bar">
+            <label style="cursor:pointer; color:var(--s)"><i data-lucide="paperclip"></i><input type="file" id="fileInp" hidden accept="image/*"></label>
+            <div class="in-box">
+                <input type="text" id="mInp" placeholder="Сообщение...">
+                <button onclick="addEmoji('😊')" style="background:none; border:none; cursor:pointer">😊</button>
+            </div>
+            <button class="btn-p" id="sendBtn" style="width:40px; height:40px; border-radius:50%; margin:0; display:flex; align-items:center; justify-content:center"><i data-lucide="arrow-up"></i></button>
+        </div>
+    </div>
+
+    <div id="prof-overlay" class="overlay">
+        <div class="card">
+            <label style="cursor:pointer">
+                <img id="pAva" class="ava" style="width:100px; height:100px; border-radius:30px; border:3px solid var(--p)">
                 <input type="file" id="avaInp" hidden accept="image/*">
             </label>
-            <h3 id="pNick" style="margin: 0 0 5px;">...</h3>
-            <p id="pEmail" style="font-size: 13px; color: #8e8e93; margin-bottom: 25px;">...</p>
-            <button class="btn-blue" onclick="location.reload()">Обновить</button>
-            <button class="btn-blue" style="background:#ff3b30; margin-top:10px;" id="logoutBtn">Выйти</button>
-            <p style="margin-top: 15px; font-size: 12px; color: #8e8e93; cursor:pointer;" onclick="closeProf()">Закрыть</button>
+            <h2 id="pNick" style="margin:10px 0">...</h2>
+            <button class="btn" style="background:var(--b); color:var(--t)" onclick="hideProf()">Закрыть</button>
+            <button class="btn" style="background:#ff3b30; color:#fff" onclick="logout()">Выйти</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdOZrTcE4ATDlGldnW8_dWRmHuaUuJfak",
@@ -152,94 +143,135 @@
         const db = getFirestore(app);
         const IMGBB_KEY = "699042c759021469e38f5370217a808f";
 
-        let isReg = false;
+        let currentChatId = null;
+        let isRegMode = false;
         lucide.createIcons();
 
-        // --- AUTH ---
-        document.getElementById('toggleAuth').onclick = () => {
-            isReg = !isReg;
-            document.getElementById('reg-fields').style.display = isReg ? 'block' : 'none';
-            document.getElementById('authBtn').innerText = isReg ? 'Создать аккаунт' : 'Войти';
+        // ТЕМА
+        window.toggleTheme = () => {
+            const b = document.body;
+            b.dataset.theme = b.dataset.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', b.dataset.theme);
+        };
+        if(localStorage.getItem('theme')) document.body.dataset.theme = localStorage.getItem('theme');
+
+        // AUTH
+        window.toggleAuthMode = () => {
+            isRegMode = !isRegMode;
+            document.getElementById('reg-info').style.display = isRegMode ? 'block' : 'none';
+            document.getElementById('authBtn').innerText = isRegMode ? 'Создать' : 'Войти';
+            document.getElementById('toggleTxt').innerText = isRegMode ? 'Уже есть аккаунт?' : 'Создать аккаунт';
         };
 
         document.getElementById('authBtn').onclick = async () => {
             const e = document.getElementById('email').value, p = document.getElementById('pass').value;
             try {
-                if(isReg) {
+                if(isRegMode) {
                     const n = document.getElementById('nick').value;
                     const res = await createUserWithEmailAndPassword(auth, e, p);
-                    await updateProfile(res.user, { displayName: n, photoURL: `https://api.dicebear.com/7.x/avataaars/svg?seed=${n}` });
+                    const ava = `https://api.dicebear.com/7.x/avataaars/svg?seed=${n}`;
+                    await updateProfile(res.user, { displayName: n, photoURL: ava });
+                    await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, nick: n, email: e, avatar: ava });
                 } else { await signInWithEmailAndPassword(auth, e, p); }
-            } catch (err) { alert("Ошибка! Проверьте данные"); }
+            } catch (err) { alert("Ошибка входа"); }
         };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, user => {
             if(user) {
                 document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('pPic').src = user.photoURL;
-                document.getElementById('pNick').innerText = user.displayName;
-                document.getElementById('pEmail').innerText = user.email;
-                initChat();
+                document.getElementById('myAva').src = user.photoURL;
+                document.getElementById('myNick').innerText = user.displayName;
+                loadChats();
             } else { document.getElementById('auth-screen').style.display = 'flex'; }
         });
 
-        // --- IMGBB UPLOAD ---
-        async function upload(file) {
-            const form = new FormData();
-            form.append("image", file);
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: form });
-            const data = await res.json();
-            return data.data.url;
-        }
-
-        document.getElementById('fileInp').onchange = async (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            const url = await upload(file);
-            await addDoc(collection(db, "messages"), { type: "img", url, user: auth.currentUser.displayName, ava: auth.currentUser.photoURL, uid: auth.currentUser.uid, time: serverTimestamp() });
+        // ПОИСК И ЧАТЫ
+        document.getElementById('userSearch').oninput = async (e) => {
+            const val = e.target.value.trim();
+            if(val.length < 2) return loadChats();
+            const q = query(collection(db, "users"), where("nick", ">=", val), where("nick", "<=", val + '\uf8ff'), limit(10));
+            const snap = await getDoc(q); // Simplified for example
+            const list = document.getElementById('chatList');
+            list.innerHTML = `<div style="padding:10px; font-size:12px; color:var(--s)">Результаты поиска:</div>`;
+            onSnapshot(q, (snaps) => {
+                snaps.forEach(uDoc => {
+                    const u = uDoc.data();
+                    if(u.uid === auth.currentUser.uid) return;
+                    list.innerHTML += `<div class="item" onclick="startPrivateChat('${u.uid}', '${u.nick}', '${u.avatar}')">
+                        <img src="${u.avatar}" class="ava">
+                        <div><b>${u.nick}</b><br><span style="font-size:11px; color:var(--p)">Написать пользователю</span></div>
+                    </div>`;
+                });
+            });
         };
 
-        document.getElementById('avaInp').onchange = async (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            const url = await upload(file);
-            await updateProfile(auth.currentUser, { photoURL: url });
-            document.getElementById('pPic').src = url;
+        window.startPrivateChat = (uid, nick, ava) => {
+            currentChatId = auth.currentUser.uid < uid ? auth.currentUser.uid + uid : uid + auth.currentUser.uid;
+            document.getElementById('chatName').innerText = nick;
+            document.getElementById('chatAva').src = ava;
+            document.getElementById('chatAva').style.display = 'block';
+            document.getElementById('chatStatus').innerText = 'Личные сообщения';
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('hide');
+                document.getElementById('backBtn').style.display = 'block';
+            }
+            loadMessages();
         };
 
-        // --- CHAT LOGIC ---
-        function initChat() {
-            onSnapshot(query(collection(db, "messages"), orderBy("time", "asc")), (snaps) => {
-                const box = document.getElementById('messages');
+        function loadMessages() {
+            const q = query(collection(db, "chats", currentChatId, "messages"), orderBy("time", "asc"));
+            onSnapshot(q, (snaps) => {
+                const box = document.getElementById('msgs');
                 box.innerHTML = "";
                 snaps.forEach(d => {
                     const m = d.data();
                     const isMe = m.uid === auth.currentUser.uid;
-                    const content = m.type === "img" ? `<img src="${m.url}" class="msg-img">` : m.text;
-                    box.innerHTML += `
-                        <div class="msg-row ${isMe ? 'me' : 'not-me'}">
-                            <img src="${m.ava}" class="ava-msg">
-                            <div class="bubble">
-                                <div style="font-size:10px; opacity:0.6; margin-bottom:2px">${m.user}</div>
-                                ${content}
-                            </div>
-                        </div>`;
+                    const content = m.type === 'img' ? `<img src="${m.url}">` : m.text;
+                    box.innerHTML += `<div class="msg ${isMe ? 'me' : 'not-me'}">${content}</div>`;
                 });
                 box.scrollTop = box.scrollHeight;
             });
         }
 
         document.getElementById('sendBtn').onclick = async () => {
-            const val = document.getElementById('msgInp').value;
-            if(!val.trim()) return;
-            await addDoc(collection(db, "messages"), { type: "text", text: val, user: auth.currentUser.displayName, ava: auth.currentUser.photoURL, uid: auth.currentUser.uid, time: serverTimestamp() });
-            document.getElementById('msgInp').value = "";
+            const t = document.getElementById('mInp').value;
+            if(!t.trim() || !currentChatId) return;
+            await addDoc(collection(db, "chats", currentChatId, "messages"), {
+                type: 'text', text: t, uid: auth.currentUser.uid, time: serverTimestamp()
+            });
+            document.getElementById('mInp').value = "";
         };
 
-        // --- UI UI ---
-        document.getElementById('openProf').onclick = () => document.getElementById('prof-modal').style.display = 'flex';
-        window.closeProf = () => document.getElementById('prof-modal').style.display = 'none';
-        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
+        // ЗАГРУЗКА ФОТО (IMGBB)
+        async function upload(file) {
+            const f = new FormData(); f.append("image", file);
+            const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: f });
+            const d = await r.json(); return d.data.url;
+        }
+
+        document.getElementById('fileInp').onchange = async e => {
+            const url = await upload(e.target.files[0]);
+            await addDoc(collection(db, "chats", currentChatId, "messages"), { type: 'img', url, uid: auth.currentUser.uid, time: serverTimestamp() });
+        };
+
+        // PROFILE
+        window.showProf = () => {
+            document.getElementById('pAva').src = auth.currentUser.photoURL;
+            document.getElementById('pNick').innerText = auth.currentUser.displayName;
+            document.getElementById('prof-overlay').style.display = 'flex';
+        };
+        window.hideProf = () => document.getElementById('prof-overlay').style.display = 'none';
+        window.logout = () => signOut(auth).then(() => location.reload());
+        window.addEmoji = (e) => document.getElementById('mInp').value += e;
+        window.backToSidebar = () => {
+            document.getElementById('sidebar').classList.remove('hide');
+            document.getElementById('backBtn').style.display = 'none';
+        }
+
+        function loadChats() {
+            // Здесь можно добавить загрузку списка последних активных диалогов
+            document.getElementById('chatList').innerHTML = `<div style="padding:20px; text-align:center; color:var(--s); font-size:13px">Используйте поиск, чтобы найти друзей</div>`;
+        }
     </script>
 </body>
 </html>
