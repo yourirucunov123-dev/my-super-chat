@@ -13,34 +13,63 @@
             --safe-bottom: 25px; 
         }
         [data-theme="light"] { --bg: #f4f4f5; --c: #ffffff; --b: #e4e4e7; --t: #09090b; --s: #71717a; }
+        
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
+        
         html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg); color: var(--t); }
         body { display: flex; flex-direction: column; position: fixed; inset: 0; }
-        .nav-bar { background: var(--c); border-top: 1px solid var(--b); display: flex; justify-content: space-around; padding: 10px 0 calc(5px + var(--safe-bottom)); z-index: 1000; flex-shrink: 0; }
+
+        .nav-bar { 
+            background: var(--c); border-top: 1px solid var(--b); display: flex; 
+            justify-content: space-around; padding: 10px 0 calc(5px + var(--safe-bottom)); 
+            z-index: 1000; flex-shrink: 0;
+        }
         .nav-item { color: var(--s); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 4px; flex: 1; transition: 0.2s; }
         .nav-item.active { color: var(--p); transform: translateY(-2px); }
+
         .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top, 0px); }
         .screen.active { display: flex; }
+
         .header { padding: 15px 20px; background: var(--c); border-bottom: 1px solid var(--b); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .content-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
-        .chat-item { background: var(--c); border-radius: 15px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid var(--b); }
+        
+        /* Стили чата как в TG */
+        .chat-item { 
+            background: var(--c); border-radius: 15px; padding: 12px; 
+            display: flex; align-items: center; gap: 12px; cursor: pointer; 
+            transition: 0.2s; border: 1px solid transparent;
+        }
+        .chat-item:active { background: var(--b); }
         .chat-info { flex: 1; overflow: hidden; }
         .chat-row { display: flex; justify-content: space-between; align-items: center; }
         .chat-time { font-size: 11px; color: var(--s); }
-        .chat-last-msg { font-size: 13px; color: var(--s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-last-msg { font-size: 13px; color: var(--s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
         .card { background: var(--c); border: 1px solid var(--b); border-radius: 20px; padding: 15px; }
         .post-img { width: 100%; border-radius: 14px; margin-top: 12px; object-fit: cover; max-height: 300px; }
+
         .input-zone { padding: 10px 15px calc(10px + var(--safe-bottom)); background: var(--c); border-top: 1px solid var(--b); display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
         .input-field { flex: 1; background: var(--bg); border: 1px solid var(--b); color: var(--t); padding: 12px 18px; border-radius: 25px; font-size: 15px; }
         .btn-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--p); border: none; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+        
         .ava { width: 48px; height: 48px; border-radius: 16px; object-fit: cover; background: var(--b); flex-shrink: 0; }
-        .bubble { max-width: 80%; padding: 8px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-wrap: break-word; display: flex; flex-direction: column; }
+        
+        /* Сообщения */
+        .bubble { 
+            max-width: 80%; padding: 8px 14px; border-radius: 18px; font-size: 15px; 
+            line-height: 1.4; word-wrap: break-word; position: relative;
+            display: flex; flex-direction: column;
+        }
         .bubble.me { align-self: flex-end; background: var(--p); color: white; border-bottom-right-radius: 4px; }
         .bubble.not-me { align-self: flex-start; background: var(--b); border-bottom-left-radius: 4px; }
         .msg-time { font-size: 10px; opacity: 0.7; align-self: flex-end; margin-top: 2px; }
-        .search-res { position: absolute; top: 70px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 15px; z-index: 500; max-height: 250px; overflow-y: auto; display: none; }
+
+        .search-res { position: absolute; top: 130px; left: 15px; right: 15px; background: var(--c); border: 1px solid var(--b); border-radius: 15px; z-index: 500; max-height: 250px; overflow-y: auto; display: none; }
         .user-row { padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid var(--b); }
-        .delete-btn { color: var(--s); padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        
+        .delete-btn { color: var(--s); padding: 5px; transition: 0.2s; border-radius: 8px; }
+        .delete-btn:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
@@ -136,16 +165,27 @@
 
         let user = null;
         let activeChatId = null;
-        let msgUnsub = null;
+        lucide.createIcons();
 
+        // Утилита для времени
         function fmtTime(ts) {
             if(!ts) return "";
             const d = ts.toDate ? ts.toDate() : new Date(ts);
             return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
+        async function upload(file) {
+            if(!file) return null;
+            const formData = new FormData();
+            formData.append("image", file);
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+                const data = await res.json();
+                return data.data.url;
+            } catch(e) { return null; }
+        }
+
         window.showScreen = (id, el) => {
-            if (msgUnsub && id !== 'msg') { msgUnsub(); msgUnsub = null; }
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scr-' + id).classList.add('active');
             if(el) {
@@ -186,7 +226,21 @@
             } else { document.getElementById('auth-screen').style.display = 'flex'; }
         });
 
-        // --- ЛЕНТА ---
+        document.getElementById('addPostBtn').onclick = () => {
+            const p = document.getElementById('post-input');
+            p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        };
+
+        document.getElementById('sendPost').onclick = async () => {
+            const text = document.getElementById('postText').value;
+            const file = document.getElementById('postFile').files[0];
+            let url = await upload(file);
+            if(!text && !url) return;
+            await addDoc(collection(db, "feed"), { text, url: url || "", user: user.displayName, ava: user.photoURL, time: serverTimestamp() });
+            document.getElementById('postText').value = ""; document.getElementById('postFile').value = "";
+            document.getElementById('post-input').style.display = 'none';
+        };
+
         function initFeed() {
             onSnapshot(query(collection(db, "feed"), orderBy("time", "desc"), limit(20)), (snaps) => {
                 const box = document.getElementById('feed-items'); box.innerHTML = "";
@@ -203,101 +257,108 @@
             });
         }
 
-        document.getElementById('addPostBtn').onclick = () => {
-            const p = document.getElementById('post-input');
-            p.style.display = p.style.display === 'none' ? 'block' : 'none';
-        };
-
-        document.getElementById('sendPost').onclick = async () => {
-            const t = document.getElementById('postText');
-            const f = document.getElementById('postFile');
-            let url = await upload(f.files[0]);
-            if(!t.value && !url) return;
-            await addDoc(collection(db, "feed"), { text: t.value, url: url || "", user: user.displayName, ava: user.photoURL, time: serverTimestamp() });
-            t.value = ""; f.value = ""; document.getElementById('post-input').style.display = 'none';
-        };
-
-        // --- ПОИСК И ЧАТЫ ---
         document.getElementById('searchUser').oninput = async (e) => {
             const val = e.target.value.toLowerCase().trim();
             const resBox = document.getElementById('searchRes');
             if(val.length < 2) { resBox.style.display = 'none'; return; }
-            const qU = query(collection(db, "users"), where("nick", ">=", val), limit(5));
-            onSnapshot(qU, (snaps) => {
+            
+            onSnapshot(query(collection(db, "users"), where("nick", ">=", val), limit(5)), (snaps) => {
                 resBox.innerHTML = "";
-                snaps.forEach(s => {
-                    const u = s.data(); if(u.uid === user.uid) return;
-                    const row = document.createElement('div'); row.className = 'user-row';
+                snaps.forEach(docSnap => {
+                    const u = docSnap.data(); 
+                    if(u.uid === user.uid) return;
+                    const row = document.createElement('div'); 
+                    row.className = 'user-row';
                     row.innerHTML = `<img src="${u.avatar}" class="ava" style="width:30px;height:30px"> <span>${u.nick}</span>`;
                     row.onclick = () => openChat(u.uid, u.nick, u.avatar);
                     resBox.appendChild(row);
                 });
-                resBox.style.display = resBox.innerHTML ? 'block' : 'none';
+                resBox.style.display = resBox.innerHTML === "" ? 'none' : 'block';
             });
         };
 
-        window.openChat = async (otherId, nick, ava) => {
-            activeChatId = user.uid < otherId ? user.uid + "_" + otherId : otherId + "_" + user.uid;
+        window.openChat = async (otherUid, nick, ava) => {
+            activeChatId = user.uid < otherUid ? user.uid + "_" + otherUid : otherUid + "_" + user.uid;
             document.getElementById('chat-title').innerText = nick;
             document.getElementById('chat-ava').src = ava;
             document.getElementById('searchRes').style.display = 'none';
             document.getElementById('searchUser').value = "";
-            showScreen('msg');
+            
+            await setDoc(doc(db, "conversations", activeChatId), {
+                users: [user.uid, otherUid],
+                time: serverTimestamp()
+            }, { merge: true });
+
+            showScreen('msg'); 
             initMessages();
         };
 
+        window.deleteChat = async (chatId, event) => {
+            event.stopPropagation();
+            if(!confirm("Удалить чат?")) return;
+            try {
+                await deleteDoc(doc(db, "conversations", chatId));
+                // Чистим экран если мы были в этом чате
+                if(activeChatId === chatId) showScreen('chats');
+            } catch (e) { console.error(e); }
+        };
+
+        // Исправленный список чатов: без дублей
         function initChatList() {
             const q = query(collection(db, "conversations"), where("users", "array-contains", user.uid), orderBy("time", "desc"));
+            
             onSnapshot(q, async (snaps) => {
                 const list = document.getElementById('chat-list');
-                list.innerHTML = "";
+                list.innerHTML = ""; // Полная очистка перед рендером
+                
                 for (const d of snaps.docs) {
                     const conv = d.data();
                     const otherId = conv.users.find(id => id !== user.uid);
                     const uDoc = await getDoc(doc(db, "users", otherId));
                     if (!uDoc.exists()) continue;
+                    
                     const other = uDoc.data();
+                    const time = fmtTime(conv.time);
+                    
                     const item = document.createElement('div');
                     item.className = 'chat-item';
-                    item.style.marginBottom = "10px";
                     item.onclick = () => openChat(otherId, other.nick, other.avatar);
+                    
                     item.innerHTML = `
                         <img src="${other.avatar}" class="ava">
                         <div class="chat-info">
-                            <div class="chat-row"><b>${other.nick}</b><span class="chat-time">${fmtTime(conv.time)}</span></div>
                             <div class="chat-row">
-                                <div class="chat-last-msg">${conv.lastMsg || "..."}</div>
-                                <div class="delete-btn" onclick="deepDeleteChat('${d.id}', event)"><i data-lucide="trash-2" size="16"></i></div>
+                                <b>${other.nick}</b>
+                                <span class="chat-time">${time}</span>
                             </div>
-                        </div>`;
+                            <div class="chat-row">
+                                <div class="chat-last-msg">${conv.lastMsg || "Нет сообщений"}</div>
+                                <div class="delete-btn" onclick="deleteChat('${d.id}', event)">
+                                    <i data-lucide="trash-2" size="16"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                     list.appendChild(item);
                 }
                 lucide.createIcons();
             });
         }
 
-        window.deepDeleteChat = async (chatId, e) => {
-            e.stopPropagation();
-            if(!confirm("Удалить чат и все сообщения?")) return;
-            try {
-                await deleteDoc(doc(db, "conversations", chatId));
-                // Примечание: В Firebase для полного удаления подколлекций (сообщений) 
-                // обычно нужен Cloud Function, но удаление основного документа скроет чат у всех.
-            } catch (err) { console.error(err); }
-        };
-
         function initMessages() {
-            if(msgUnsub) msgUnsub();
-            const qM = query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc"));
-            msgUnsub = onSnapshot(qM, (snaps) => {
+            const q = query(collection(db, "chats", activeChatId, "messages"), orderBy("time", "asc"));
+            onSnapshot(q, (snaps) => {
                 const box = document.getElementById('messages-box');
                 box.innerHTML = "";
                 snaps.forEach(d => {
                     const m = d.data();
-                    const b = document.createElement('div');
-                    b.className = `bubble ${m.uid === user.uid ? 'me' : 'not-me'}`;
-                    b.innerHTML = `${m.text}<span class="msg-time">${fmtTime(m.time)}</span>`;
-                    box.appendChild(b);
+                    const bubble = document.createElement('div');
+                    bubble.className = `bubble ${m.uid === user.uid ? 'me' : 'not-me'}`;
+                    bubble.innerHTML = `
+                        ${m.text}
+                        <span class="msg-time">${fmtTime(m.time)}</span>
+                    `;
+                    box.appendChild(bubble);
                 });
                 box.scrollTop = box.scrollHeight;
             });
@@ -305,31 +366,39 @@
 
         document.getElementById('sendMsg').onclick = async () => {
             const input = document.getElementById('msgInput');
-            const txt = input.value.trim();
-            if(!txt || !activeChatId) return;
-            const cid = activeChatId;
+            const text = input.value.trim();
+            if(!text || !activeChatId) return;
+            
+            const msgData = {
+                text,
+                uid: user.uid,
+                time: serverTimestamp()
+            };
+
+            await addDoc(collection(db, "chats", activeChatId, "messages"), msgData);
+
+            await setDoc(doc(db, "conversations", activeChatId), {
+                lastMsg: text,
+                time: serverTimestamp(),
+                users: activeChatId.split('_')
+            }, { merge: true });
+
             input.value = "";
-            await addDoc(collection(db, "chats", cid, "messages"), { text: txt, uid: user.uid, time: serverTimestamp() });
-            await setDoc(doc(db, "conversations", cid), { lastMsg: txt, time: serverTimestamp(), users: cid.split('_') }, { merge: true });
         };
 
-        async function upload(file) {
-            if(!file) return null;
-            const fd = new FormData(); fd.append("image", file);
-            const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-            const d = await r.json(); return d.data.url;
-        }
+        document.getElementById('deleteAccBtn').onclick = async () => {
+            if(!confirm("Удалить аккаунт навсегда?")) return;
+            try { 
+                await deleteDoc(doc(db, "users", auth.currentUser.uid)); 
+                await deleteUser(auth.currentUser); 
+                location.reload(); 
+            } catch (e) { alert("Перезайдите в аккаунт и попробуйте снова."); }
+        };
 
         window.logout = () => signOut(auth).then(() => location.reload());
         window.toggleTheme = () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
-        };
-        document.getElementById('deleteAccBtn').onclick = async () => {
-            if(confirm("Удалить аккаунт?")) {
-                await deleteDoc(doc(db, "users", user.uid));
-                await deleteUser(auth.currentUser);
-                location.reload();
-            }
+            const current = document.body.dataset.theme;
+            document.body.dataset.theme = current === 'light' ? 'dark' : 'light';
         };
     </script>
 </body>
